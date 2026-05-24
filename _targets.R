@@ -18,6 +18,12 @@ data_targets <- tar_plan(
     pattern = map(ris_file_paths)
   ),
   tar_target(
+    name = search_full_ris,
+    command = synthesisr::read_refs(filename = ris_file_paths),
+    pattern = map(ris_file_paths),
+    iteration = "list"
+  ),
+  tar_target(
     name = search_full_raw,
     command = synthesisr::read_refs(filename = ris_all_file)
   ),
@@ -49,6 +55,10 @@ processing_targets <- tar_plan(
       search_df = search_full_deduplicated, 
       retraction_df = retraction_watch_data
     )
+  ),
+  tar_target(
+    name = search_full_processed,
+    command = process_search(search_full_no_retractions)
   )
 )
 
