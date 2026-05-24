@@ -32,3 +32,15 @@ all_targets <- function(env = parent.env(environment()),
   }
   return(out)
 }
+
+
+#'
+#' 
+#' Simplify single element lists
+#' 
+
+simplify_list <- function(x) {
+  x <- as.character(x)
+
+  ifelse(x == "NULL", NA, x)
+}
