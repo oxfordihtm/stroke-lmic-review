@@ -1,9 +1,16 @@
 #'
 #' Process search results
 #' 
-#' @param search_df A data.frame() object of the raw full search output.
+#' @param search_df A `data.frame()`` object of the raw full search output.
 #' 
+#' @returns A `tibble::tibble()`/`data.frame()` object of the processed full
+#'   search.
 #' 
+#' @examples
+#' process_search(search_full_no_retractions)
+#' 
+#' @export
+#'
 
 process_search <- function(search_df) {
   df <- search_df |>
@@ -59,7 +66,17 @@ process_search <- function(search_df) {
       ),
       conference_date = as.Date(x = conference_date, format = "%Y%m%d")
     ) |>
-    dplyr::select(-n_duplicates)
+    dplyr::select(-n_duplicates) |>
+    dplyr::select(
+      database, source_type, publication_type, reference_identifier, pubmed_id,
+      accession_zr, issn, language, journal, publisher, title, abstract,
+      keywords, author_1, author_2, author_3, address, author_affiliation_1,
+      author_affiliation_2, author_affiliation_3, year, volume, issue,
+      start_page, end_page, doi, url, link_to_full_text, proceedings_title,
+      conference_date, company, source, chemicals, software_tools,
+      funding_number, notes, XT
+    )
   
   df
 }
+
