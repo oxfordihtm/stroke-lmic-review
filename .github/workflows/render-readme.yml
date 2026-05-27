@@ -9,8 +9,11 @@ jobs:
   render-readme:
     runs-on: ubuntu-latest
     container: rocker/tidyverse:4.6.0
+    permissions:
+      contents: write
     env:
       GIT_CRYPT_KEY64: ${{ secrets.GIT_CRYPT_KEY64 }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v6
       
