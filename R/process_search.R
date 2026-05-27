@@ -17,9 +17,9 @@ process_search <- function(search_df) {
     dplyr::mutate(
       language = simplify_list(language),
       journal = simplify_list(journal),
-      volume = simplify_list(volume) |> as.integer(),
+      volume = simplify_list(volume) |> suppressWarnings(as.integer()),
       issue = simplify_list(issue),
-      start_page = simplify_list(start_page) |> as.integer(),
+      start_page = simplify_list(start_page) |> suppressWarnings(as.integer()),
       doi = simplify_list(doi),
       accession_zr = simplify_list(accession_zr),
       url = simplify_list(url),
