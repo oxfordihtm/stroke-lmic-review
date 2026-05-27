@@ -65,7 +65,61 @@ stroke-lmic-review
 
 ## Reproducibility
 
+### R version
+
+This project is built using `R 4.6.0`. To manage R versions, it is recommended to use [`rig`](https://github.com/r-lib/rig) - an R installation manager - to be able to install multiple versions of R and switch between them as needed.
+
 ### R package dependencies
 
-This project was built using `R 4.6.0`. This project uses the `renv` framework to record R package dependencies and versions. Packages and versions used are recorded in `renv.lock` and code used to manage dependencies is in `renv/` and other files in the root project directory. On starting an R session in the working directory, run `renv::restore()` to install R package dependencies.
+This project uses the `{renv}` framework to record R package dependencies and versions. Packages and versions used are recorded in `renv.lock` and code used to manage dependencies is in the `renv` directory and other files in the root project directory.
+
+On starting an R session in the working directory of this repository, first run 
+
+```R
+renv::restore()
+```
+
+to install R package dependencies. This is only done once when the project is being initiated for the first time by a user.
+
+<!-- ### Encryption
+
+This project uses encrypted environment variables and authentication keys for data retrieval managed using [`git-crypt`](https://github.com/AGWA/git-crypt). Collaborators will need to [install `git-crypt`](https://github.com/AGWA/git-crypt) and then provide their GPG key to the authors to be added as an authorised user within the repository. To get a GPG key, [download and install GPG](https://www.gnupg.org/download/) and then [generate your GPG key pair](https://www.gnupg.org/gph/en/manual/c14.html). Then provide your GPG key id to the authors.
+
+Once given permission into the project and GPG key id added to the repository, update your local version of the repository by doing a `git pull` and then unlock the encrypted files/folders of the repository by running the following command in Terminal from within the project directory:
+
+```bash
+git-crypt unlock
+```
+
+The encrypted components of the repository will now be decrypted and accessible for running the workflow (described below). -->
+
+### The workflow
+
+The current workflow has the following steps:
+
+```{r full-workflow, echo = FALSE, results = "asis"}
+cat(
+  c(
+    "```mermaid",
+    targets::tar_mermaid(
+      targets_only = TRUE, outdated = FALSE, legend = FALSE, color = FALSE
+    ),
+    "```"
+  ),
+  sep = "\n"
+)
+```
+
+To run the workflow, issue the following command in R from within the project directory
+
+```R
+targets::tar_make()
+```
+
+or issue the following command in Terminal from within the project directory
+
+```bash
+Rscript -e  "targets::tar_make()"
+```
+
 

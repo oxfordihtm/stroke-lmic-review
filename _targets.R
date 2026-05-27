@@ -59,7 +59,21 @@ processing_targets <- tar_plan(
   tar_target(
     name = search_full_processed,
     command = process_search(search_full_no_retractions)
+  ),
+  tar_target(
+    name = search_full_processed_flattened,
+    command = flatten_search(search_full_processed)
+  ),
+  tar_target(
+    name = search_full_processed_abridged,
+    command = search_full_processed |>
+      dplyr::select()
   )
+)
+
+
+## LLM targets ----
+llm_targets <- tar_plan(
 )
 
 
@@ -74,6 +88,13 @@ output_targets <- tar_plan(
   tar_target(
     name = ris_all_file,
     command = output_ris_file(ris = ris_all, dest = "data/search_all.ris")
+  ),
+  tar_target(
+    name = search_full_processed_flattened_csv,
+    command = output_csv_file(
+      df = search_full_processed_flattened,
+      path = "data/search_full_processed_flattened.csv"
+    )
   )
 )
 

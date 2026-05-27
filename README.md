@@ -83,11 +83,76 @@ The project repository is structured as follows:
 
 ## Reproducibility
 
+### R version
+
+This project is built using `R 4.6.0`. To manage R versions, it is
+recommended to use [`rig`](https://github.com/r-lib/rig) - an R
+installation manager - to be able to install multiple versions of R and
+switch between them as needed.
+
 ### R package dependencies
 
-This project was built using `R 4.6.0`. This project uses the `renv`
-framework to record R package dependencies and versions. Packages and
-versions used are recorded in `renv.lock` and code used to manage
-dependencies is in `renv/` and other files in the root project
-directory. On starting an R session in the working directory, run
-`renv::restore()` to install R package dependencies.
+This project uses the `{renv}` framework to record R package
+dependencies and versions. Packages and versions used are recorded in
+`renv.lock` and code used to manage dependencies is in the `renv`
+directory and other files in the root project directory.
+
+On starting an R session in the working directory of this repository,
+first run
+
+``` r
+renv::restore()
+```
+
+to install R package dependencies. This is only done once when the
+project is being initiated for the first time by a user.
+
+<!-- ### Encryption
+&#10;This project uses encrypted environment variables and authentication keys for data retrieval managed using [`git-crypt`](https://github.com/AGWA/git-crypt). Collaborators will need to [install `git-crypt`](https://github.com/AGWA/git-crypt) and then provide their GPG key to the authors to be added as an authorised user within the repository. To get a GPG key, [download and install GPG](https://www.gnupg.org/download/) and then [generate your GPG key pair](https://www.gnupg.org/gph/en/manual/c14.html). Then provide your GPG key id to the authors.
+&#10;Once given permission into the project and GPG key id added to the repository, update your local version of the repository by doing a `git pull` and then unlock the encrypted files/folders of the repository by running the following command in Terminal from within the project directory:
+&#10;```bash
+git-crypt unlock
+```
+&#10;The encrypted components of the repository will now be decrypted and accessible for running the workflow (described below). -->
+
+### The workflow
+
+The current workflow has the following steps:
+
+Warning: program compiled against libxml 213 using older 209
+
+``` mermaid
+graph LR
+  style Graph fill:#FFFFFF00,stroke:#000000;
+  subgraph Graph
+    direction LR
+    xb4a9c9edd73bec9b(["retraction_watch_data_download_csv_file"]):::skipped --> x71f5d31f85b83ceb(["retraction_watch_data"]):::skipped
+    xe03e263fab696ab7(["retraction_watch_data_url"]):::skipped --> xb4a9c9edd73bec9b(["retraction_watch_data_download_csv_file"]):::skipped
+    x188aa7ffce88bb98(["ris_file_paths"]):::skipped --> x6ba4c23c2738dda8["ris_all"]:::skipped
+    x6ba4c23c2738dda8["ris_all"]:::skipped --> x4b7fcdd63fd7fb9a(["ris_all_file"]):::skipped
+    x2f7fdb4e976b16f9(["search_full_raw"]):::skipped --> x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped
+    x71f5d31f85b83ceb(["retraction_watch_data"]):::skipped --> xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped
+    x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped
+    xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> xcf6ddd66dde32d43(["search_full_processed"]):::skipped
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xaad9cc064e72d1f3(["search_full_processed_abridged"]):::skipped
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xd596227685e2e430(["search_full_processed_flattened"]):::skipped
+    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> x4b455536a354b302(["search_full_processed_flattened_csv"]):::completed
+    x4b7fcdd63fd7fb9a(["ris_all_file"]):::skipped --> x2f7fdb4e976b16f9(["search_full_raw"]):::skipped
+    x188aa7ffce88bb98(["ris_file_paths"]):::skipped --> xfda738880e222baf["search_full_ris"]:::skipped
+    
+  end
+```
+
+To run the workflow, issue the following command in R from within the
+project directory
+
+``` r
+targets::tar_make()
+```
+
+or issue the following command in Terminal from within the project
+directory
+
+``` bash
+Rscript -e  "targets::tar_make()"
+```
