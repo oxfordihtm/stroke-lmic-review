@@ -133,10 +133,10 @@ graph LR
     x2f7fdb4e976b16f9(["search_full_raw"]):::skipped --> x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped
     x71f5d31f85b83ceb(["retraction_watch_data"]):::skipped --> xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped
     x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped
-    xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> xcf6ddd66dde32d43(["search_full_processed"]):::skipped
-    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xaad9cc064e72d1f3(["search_full_processed_abridged"]):::skipped
-    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xd596227685e2e430(["search_full_processed_flattened"]):::skipped
-    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> x4b455536a354b302(["search_full_processed_flattened_csv"]):::completed
+    xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> xcf6ddd66dde32d43(["search_full_processed"]):::completed
+    xcf6ddd66dde32d43(["search_full_processed"]):::completed --> xaad9cc064e72d1f3(["search_full_processed_abridged"]):::completed
+    xcf6ddd66dde32d43(["search_full_processed"]):::completed --> xd596227685e2e430(["search_full_processed_flattened"]):::completed
+    xd596227685e2e430(["search_full_processed_flattened"]):::completed --> x4b455536a354b302(["search_full_processed_flattened_csv"]):::completed
     x4b7fcdd63fd7fb9a(["ris_all_file"]):::skipped --> x2f7fdb4e976b16f9(["search_full_raw"]):::skipped
     x188aa7ffce88bb98(["ris_file_paths"]):::skipped --> xfda738880e222baf["search_full_ris"]:::skipped
     
