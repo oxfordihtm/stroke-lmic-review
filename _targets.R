@@ -8,9 +8,9 @@ for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 
 ## Build options ----
 
-### Set Google credientials ----
+### Set Google credentials ----
 
-gargle::credentials_service_account(path = "auth/oxford-ihtm-0abfa083dba6.json")
+gargle::credentials_service_account(path = Sys.getenv("GOOGLE_AUTH_FILE"))
 
 
 ## Data targets ----
