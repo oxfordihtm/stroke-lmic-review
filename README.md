@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Mapping the Evidence Gaps for Stroke in Low and Middle-Income Countries
+# Mapping the Evidence Gaps for Stroke in Lower-Middle Income Countries (LMIC) and Low Income Countries (LIC)
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -16,11 +16,12 @@ gaps for stroke in low and middle-income countries.
 ## About the Project
 
 The burden of stroke is among the top five causes of mortality and
-morbidity in low and middle-income countries (LMICs) and this burden is
-growing, yet evidence on contributing causes and the efficacy of
-interventions appears to be disproportionately generated in high-income
-settings for discrete population groups. This review maps existing
-evidence drawing on LMIC populations.
+morbidity in low-middle income countries (LMICs) and low income
+countries (LICs) and this burden is growing, yet evidence on
+contributing causes and the efficacy of interventions appears to be
+disproportionately generated in high-income settings for discrete
+population groups. This review maps existing evidence drawing on LMIC
+and LIC populations.
 
 ## Repository Structure
 
@@ -126,19 +127,24 @@ graph LR
   style Graph fill:#FFFFFF00,stroke:#000000;
   subgraph Graph
     direction LR
+    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::errored
+    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::errored
     xb4a9c9edd73bec9b(["retraction_watch_data_download_csv_file"]):::skipped --> x71f5d31f85b83ceb(["retraction_watch_data"]):::skipped
     xe03e263fab696ab7(["retraction_watch_data_url"]):::skipped --> xb4a9c9edd73bec9b(["retraction_watch_data_download_csv_file"]):::skipped
     x188aa7ffce88bb98(["ris_file_paths"]):::skipped --> x6ba4c23c2738dda8["ris_all"]:::skipped
     x6ba4c23c2738dda8["ris_all"]:::skipped --> x4b7fcdd63fd7fb9a(["ris_all_file"]):::skipped
+    x971c8918645ea4f3(["search_abstract"]):::skipped --> xf493b7d472ff5e59(["screening_prompt"]):::skipped
+    x4946600ed43ea69a(["search_title"]):::skipped --> xf493b7d472ff5e59(["screening_prompt"]):::skipped
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x971c8918645ea4f3(["search_abstract"]):::skipped
     x2f7fdb4e976b16f9(["search_full_raw"]):::skipped --> x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped
     x71f5d31f85b83ceb(["retraction_watch_data"]):::skipped --> xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped
     x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped
-    xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> xcf6ddd66dde32d43(["search_full_processed"]):::completed
-    xcf6ddd66dde32d43(["search_full_processed"]):::completed --> xaad9cc064e72d1f3(["search_full_processed_abridged"]):::completed
-    xcf6ddd66dde32d43(["search_full_processed"]):::completed --> xd596227685e2e430(["search_full_processed_flattened"]):::completed
-    xd596227685e2e430(["search_full_processed_flattened"]):::completed --> x4b455536a354b302(["search_full_processed_flattened_csv"]):::completed
+    xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> xcf6ddd66dde32d43(["search_full_processed"]):::skipped
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xd596227685e2e430(["search_full_processed_flattened"]):::skipped
+    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> x4b455536a354b302(["search_full_processed_flattened_csv"]):::skipped
     x4b7fcdd63fd7fb9a(["ris_all_file"]):::skipped --> x2f7fdb4e976b16f9(["search_full_raw"]):::skipped
     x188aa7ffce88bb98(["ris_file_paths"]):::skipped --> xfda738880e222baf["search_full_ris"]:::skipped
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x4946600ed43ea69a(["search_title"]):::skipped
     
   end
 ```

@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Mapping the Evidence Gaps for Stroke in Low and Middle-Income Countries
+# Mapping the Evidence Gaps for Stroke in Lower-Middle Income Countries (LMIC) and Low Income Countries (LIC)
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -20,7 +20,7 @@ This repository is a template for a [`docker`](https://www.docker.com/get-starte
 
 ## About the Project
 
-The burden of stroke is among the top five causes of mortality and morbidity in low and middle-income countries (LMICs) and this burden is growing, yet evidence on contributing causes and the efficacy of interventions appears to be disproportionately generated in high-income settings for discrete population groups. This review maps existing evidence drawing on LMIC populations.  
+The burden of stroke is among the top five causes of mortality and morbidity in low-middle income countries (LMICs) and low income countries (LICs) and this burden is growing, yet evidence on contributing causes and the efficacy of interventions appears to be disproportionately generated in high-income settings for discrete population groups. This review maps existing evidence drawing on LMIC and LIC populations.  
 
 ## Repository Structure
 

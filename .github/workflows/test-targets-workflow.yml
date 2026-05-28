@@ -41,7 +41,6 @@ jobs:
         
       - name: Run workflow
         run: |
-          targets::tar_make()
+          targets::tar_make(dplyr::starts_with("screening"))
         shell: Rscript {0}
-        
         

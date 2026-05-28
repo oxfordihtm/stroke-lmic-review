@@ -6,6 +6,13 @@ suppressPackageStartupMessages(source("packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 
 
+## Build options ----
+
+### Set Google credientials ----
+
+gargle::credentials_service_account(path = "auth/oxford-ihtm-0abfa083dba6.json")
+
+
 ## Data targets ----
 data_targets <- tar_plan(
   tar_target(
@@ -40,7 +47,9 @@ data_targets <- tar_plan(
       path = retraction_watch_data_download_csv_file
     )
   )
-) 
+)
+
+
 ## Processing targets ----
 processing_targets <- tar_plan(
   tar_target(
@@ -65,15 +74,38 @@ processing_targets <- tar_plan(
     command = flatten_search(search_full_processed)
   ),
   tar_target(
-    name = search_full_processed_abridged,
-    command = search_full_processed |>
-      dplyr::select()
+    name = search_title,
+    command = get_title(search_full_processed)
+  ),
+  tar_target(
+    name = search_abstract,
+    command = get_abstract(search_full_processed)
   )
 )
 
 
-## LLM targets ----
-llm_targets <- tar_plan(
+prompt_targets <- tar_plan(
+  tar_target(
+    name = screening_context_prompt,
+    command = create_screening_context_prompt()
+  ),
+  tar_target(
+    name = screening_prompt,
+    command = create_screening_prompt(
+      search_title = search_title, search_abstract = search_abstract
+    )
+  )
+)
+
+## Gemini LLM targets ----
+gemini_targets <- tar_plan(
+  tar_target(
+    name = gemini_screen_primary,
+    command = gemini_screen_articles(
+      context = screening_context_prompt, query = screening_prompt
+    ),
+    pattern = map(screening_prompt)
+  )  
 )
 
 
