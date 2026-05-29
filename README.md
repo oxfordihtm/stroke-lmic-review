@@ -156,16 +156,25 @@ graph LR
   style Graph fill:#FFFFFF00,stroke:#000000;
   subgraph Graph
     direction LR
-    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::dispatched
-    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::dispatched
-    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
-    x4946600ed43ea69a(["search_title"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
-    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
-    x971c8918645ea4f3(["search_abstract"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
-    x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
-    x2f7fdb4e976b16f9(["search_full_raw"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
-    xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
-    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
+    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::queued
+    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::queued
+    xf0985b06dbe6e89a["gemini_screen_primary"]:::queued --> x3dbfbc99d94452b0(["gemini_screen_primary_processed"]):::queued
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x3dbfbc99d94452b0(["gemini_screen_primary_processed"]):::queued
+    xf0985b06dbe6e89a["gemini_screen_primary"]:::queued --> x00c1b0b88ef93218(["gemini_screen_primary_processed_flattened"]):::queued
+    xd596227685e2e430(["search_full_processed_flattened"]):::queued --> x00c1b0b88ef93218(["gemini_screen_primary_processed_flattened"]):::queued
+    x00c1b0b88ef93218(["gemini_screen_primary_processed_flattened"]):::queued --> x3da0672e497133c7(["gemini_screen_primary_processed_flattened_csv"]):::queued
+    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> x4979191191b66b4d["gemma_screen_primary"]:::dispatched
+    xe87907656f0dab63(["gemma_model_latest"]):::completed --> x4979191191b66b4d["gemma_screen_primary"]:::dispatched
+    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> x4979191191b66b4d["gemma_screen_primary"]:::dispatched
+    x971c8918645ea4f3(["search_abstract"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    xd596227685e2e430(["search_full_processed_flattened"]):::queued --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    x4946600ed43ea69a(["search_title"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    x2f7fdb4e976b16f9(["search_full_raw"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
     xb4a9c9edd73bec9b(["retraction_watch_data_download_csv_file"]):::skipped --> x71f5d31f85b83ceb(["retraction_watch_data"]):::skipped
     xe03e263fab696ab7(["retraction_watch_data_url"]):::skipped --> xb4a9c9edd73bec9b(["retraction_watch_data_download_csv_file"]):::skipped
     x188aa7ffce88bb98(["ris_file_paths"]):::skipped --> x6ba4c23c2738dda8["ris_all"]:::skipped
@@ -177,10 +186,10 @@ graph LR
     x71f5d31f85b83ceb(["retraction_watch_data"]):::skipped --> xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped
     x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped
     xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> xcf6ddd66dde32d43(["search_full_processed"]):::skipped
-    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xd596227685e2e430(["search_full_processed_flattened"]):::skipped
-    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> x4b455536a354b302(["search_full_processed_flattened_csv"]):::skipped
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xd596227685e2e430(["search_full_processed_flattened"]):::queued
+    xd596227685e2e430(["search_full_processed_flattened"]):::queued --> x4b455536a354b302(["search_full_processed_flattened_csv"]):::queued
     x4b7fcdd63fd7fb9a(["ris_all_file"]):::skipped --> x2f7fdb4e976b16f9(["search_full_raw"]):::skipped
-    x188aa7ffce88bb98(["ris_file_paths"]):::skipped --> xfda738880e222baf["search_full_ris"]:::skipped
+    x188aa7ffce88bb98(["ris_file_paths"]):::skipped --> xfda738880e222baf["search_full_ris"]:::queued
     xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x4946600ed43ea69a(["search_title"]):::skipped
     
   end
