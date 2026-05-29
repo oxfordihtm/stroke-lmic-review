@@ -108,13 +108,42 @@ renv::restore()
 to install R package dependencies. This is only done once when the
 project is being initiated for the first time by a user.
 
-<!-- ### Encryption
-&#10;This project uses encrypted environment variables and authentication keys for data retrieval managed using [`git-crypt`](https://github.com/AGWA/git-crypt). Collaborators will need to [install `git-crypt`](https://github.com/AGWA/git-crypt) and then provide their GPG key to the authors to be added as an authorised user within the repository. To get a GPG key, [download and install GPG](https://www.gnupg.org/download/) and then [generate your GPG key pair](https://www.gnupg.org/gph/en/manual/c14.html). Then provide your GPG key id to the authors.
-&#10;Once given permission into the project and GPG key id added to the repository, update your local version of the repository by doing a `git pull` and then unlock the encrypted files/folders of the repository by running the following command in Terminal from within the project directory:
-&#10;```bash
+### Encryption
+
+This project uses encrypted environment variables and authentication
+keys used to authenticate with the different services used by the
+project. These services include:
+
+- Large language models (LLMs) provided by
+  [OpenAI](https://chatgpt.com/), [Anthropic](https://claude.ai/new),
+  and [Google](https://gemini.google.com/); and,
+
+- [Sheets](https://sheets.google.com),
+  [Drive](https://drive.google.com), and
+  [Gmail](https://mail.google.com) services provided by
+  [Google](https://www.google.com).
+
+Encryption is managed using
+[`git-crypt`](https://github.com/AGWA/git-crypt). Collaborators will
+need to [install `git-crypt`](https://github.com/AGWA/git-crypt) and
+then provide their GPG key to the repository administrators to be added
+as an authorised user within the repository. To get a GPG key, [download
+and install GPG](https://www.gnupg.org/download/) and then [generate
+your GPG key pair](https://www.gnupg.org/gph/en/manual/c14.html). Then
+provide your GPG key id to the authors.
+
+Once given permission into the project and GPG key id added to the
+repository, update your local version of the repository by doing a
+`git pull` and then unlock the encrypted files/folders of the repository
+by running the following command on the terminal from within the project
+directory:
+
+``` bash
 git-crypt unlock
 ```
-&#10;The encrypted components of the repository will now be decrypted and accessible for running the workflow (described below). -->
+
+The encrypted components of the repository will now be decrypted and
+accessible for running the workflow (described below).
 
 ### The workflow
 
@@ -127,8 +156,16 @@ graph LR
   style Graph fill:#FFFFFF00,stroke:#000000;
   subgraph Graph
     direction LR
-    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::errored
-    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::errored
+    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::dispatched
+    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::dispatched
+    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
+    x4946600ed43ea69a(["search_title"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
+    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
+    x971c8918645ea4f3(["search_abstract"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
+    x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
+    x2f7fdb4e976b16f9(["search_full_raw"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
+    xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::completed
     xb4a9c9edd73bec9b(["retraction_watch_data_download_csv_file"]):::skipped --> x71f5d31f85b83ceb(["retraction_watch_data"]):::skipped
     xe03e263fab696ab7(["retraction_watch_data_url"]):::skipped --> xb4a9c9edd73bec9b(["retraction_watch_data_download_csv_file"]):::skipped
     x188aa7ffce88bb98(["ris_file_paths"]):::skipped --> x6ba4c23c2738dda8["ris_all"]:::skipped
@@ -162,3 +199,48 @@ directory
 ``` bash
 Rscript -e  "targets::tar_make()"
 ```
+
+## Authors and Contributors
+
+## Authors
+
+- Dr Minh Cong Tran
+- Dr Ernest Guevarra
+
+## Contributors
+
+- Dr Proochista Ariana
+- Dr Aisha Adamu
+- Dr Parinda Wattanasri
+- Dr Ainura Moldokmatova
+- Dr Chit Su Tinn
+- Dr Fona Qorina
+
+## License
+
+All code in this project is released under a
+[GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.en.html#license-text)
+license. All text in this project is released under a
+[CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/deed.en)
+license. All data is released under a
+[CC0](https://creativecommons.org/public-domain/cc0/) license.
+
+## Citation
+
+If you use the data provided through `seystats` in your work/research,
+please cite `seystats` along with all the sources of data that were used
+for curating the data available herewith. The suggested appropriate
+citation metadata is provided in
+[CITATION.cff](https://github.com/OxfordIHTM/seystats/blob/main/CITATION.cff).
+
+## Community guidelines
+
+Feedback, bug reports and feature requests are welcome; file issues or
+seek support
+[here](https://github.com/OxfordIHTM/stroke-lmic-review/issues). If you
+would like to contribute to the project, please see our [contributing
+guidelines](https://github.com/OxfordIHTM/stroke-lmic-review/blob/main/.github/CONTRIBUTING.md).
+
+This project is released with a [Contributor Code of
+Conduct](https://github.com/OxfordIHTM/stroke-lmic-review/blob/main/.github/CODE_OF_CONDUCT.md).
+By participating in this project you agree to abide by its terms.

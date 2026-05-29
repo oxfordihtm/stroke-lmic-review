@@ -1,0 +1,233 @@
+---
+title: Preliminary results of the large language model (LLM) assisted screening of the search results of the scoping review on stroke
+subtitle: Mapping the Evidence Gaps for Stroke in Lower-Middle Income Countries (LMIC) and Low Income Countries (LIC)
+author:
+  - name: Minh Cong Tran
+    orcid: 0000-0003-2622-1365
+    email: minh.tran@ndm.ox.ac.uk
+    affiliation:
+      - name: University of Oxford
+        department: Nuffield Department of Medicine
+        group: Centre for Tropical Medicine and Global Health
+        address: Peter Medawar Building for Pathogen Research, South Parks Road
+        city: Oxford 
+        country: United Kingdom
+        postal-code: OX1 3SY
+        url: https://www.tropicalmedicine.ox.ac.uk/study-with-us/msc-ihtm
+  - name: Ernest Guevarra
+    orcid: 0000-0002-4887-4415
+    email: ernest.guevarra@ndm.ox.ac.uk
+    affiliation: 
+      - name: University of Oxford
+        department: Nuffield Department of Medicine
+        group: Centre for Tropical Medicine and Global Health
+        address: Peter Medawar Building for Pathogen Research, South Parks Road
+        city: Oxford
+        country: United Kingdom
+        postal-code: OX1 3SY
+        url: https://www.tropicalmedicine.ox.ac.uk/study-with-us/msc-ihtm
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+format: 
+  html:
+    toc: true
+    toc-location: left
+    embed-resources: true
+    grid:
+      body-width: 900px
+      margin-width: 300px
+    code-tools:
+      source: https://github.com/OxfordIHTM/stroke-lmic-review/blob/main/reports/preliminary_report.qmd
+---
+
+```{r setup}
+#| echo: false
+
+suppressPackageStartupMessages(source(here::here("packages.R")))
+for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
+
+targets::tar_load(
+  c(
+    search_full_raw, search_full_deduplicated, search_full_no_retractions, search_full_processed, search_full_processed_flattened, 
+    search_title, search_abstract, screening_context_prompt, screening_prompt#,
+    #gemini_screen_primary
+  )
+)
+```
+
+This report outlines the different steps undertaken to perform a large language model (LLM)-assisted screening of search results for the **scoping review on stroke in lower-middle income countries (LMIC) and low income countries (LIC)** and their corresponding results/outcomes. The methods and results described in this report contribute to the overall project on **Mapping the Evidence Gaps for Stroke in Lower-Middle Income Countries (LMIC) and Low Income Countries (LIC)**.
+
+## The search
+
+### Population-concept-context (PCC) framework
+
+Relevant studies were identified based on the following inclusion criteria that anchors on the population-concept-context (PCC) framework.
+
+**Framework** | **Inclusion** | **Exclusion**
+:--- | :--- | :---
+**Population** | Adult population aged 18 years and older residing in LMIC | Children under 18 years old, migrants from LMIC residing in HIC
+**Concept** | evidence regarding stroke burden (prevalence, incidence, DALY, QALY, disability, death, hospitalisation), types (ischaemic/haemorrhagic), risk factors, and interventions | At the full text review stage we will consider how to exclude the clinical management category
+**Context** | Geographic setting: LMIC, LIC | Geographic setting: HIC 
+**Publication type** | Primary studies: cohort, case-control, cross-sectional, and interventional studies | grey literature (reports, conference materials), secondary research (reviews), study protocols, modelling studies, cost of illness studies, case series/reports, and editorials
+**Language** | All languages (no limit to English) | N/A
+
+### Search strategy
+
+Using this PCC framework criteria, a search strategy was developed using the [Ovid](https://www.ovid.com/) research platform via the University of Oxford Bodleian Libraries institutional access. Several hundreds of databases are available via University of Oxford's institutional access to Ovid but for this specific scoping review, researchers were advised to use [Embase](https://www.wolterskluwer.com/en/solutions/ovid/embase-903), [Ovid Medline](https://www.wolterskluwer.com/en/solutions/ovid/ovid-medline-901), and [Global Health](https://www.wolterskluwer.com/en/solutions/ovid/global-health-30) databases.
+
+An initial limited search of [PubMed](https://pubmed.ncbi.nlm.nih.gov/) was conducted to identify key search terms. The text words identified in this search, along with related index terms for each database, were then used to develop the full search strategy. **In addition, the reference lists of reviews will be screened to identify further relevant studies**. The search covers publications up to 10 May 2026.   
+
+For country identification, we applied the [Cochrane EPOC filter for low income countries (LIC) and lower-middle income countries (LMICs)](https://epoc.cochrane.org/lmic-filters), adapted to search only within the title and abstract fields across the three selected Ovid databases.
+
+#### Embase
+
+The following search strategy was tested and used for the Embase database.
+
+**Step** | **Search**
+:--- | :---
+1 | (afghan* or africa* or albania* or algeria* or angola* or antigua* or barbuda* or argentin* or armenia* or aruba* or azerbaijan* or bahrain* or bangladesh* or bengal* or bangal* or barbados* or barbadian* or bajan or bajans or belarus* or belorus* or byelarus* or byelorus* or belize* or benin* or dahomey or bhutan* or bolivia* or bosnia* or herzegovin* or botswan* or batswan* or bechuanaland* or brazil* or brasil* or bulgaria* or burkina* or burkinese* or upper volta* or burundi* or urundi* or cabo verde* or cape verde* or cambodia* or kampuchea* or khmer* or cameroon* or cameroun* or ubangi shari* or chad* or chile* or china* or chinese or colombia* or comoro* or comore* or comorian* or mayotte* or congo* or zaire* or costa rica* or "cote d'ivoir*" or "cote d' ivoir*" or cote divoir* or cote d ivoir* or ivory coast* or ivorian* or croatia* or cuba or cuban or cubans or "cuba's" or cyprus* or cypriot* or czech* or djibouti* or french somaliland* or dominica* or ecuador* or egypt* or united arab republic* or el salvador* or salvadoran* or guinea* or equatoguinea* or eritrea* or estonia* or eswatini* or swaziland* or swazi* or swati* or ethiopia* or fiji* or gabon* or gabonese* or gabonaise* or gambia* or ((georgia or georgian or georgians) not (atlanta or california or florida)) or ghana* or gibraltar* or greece* or greek* or grecian* or grenada* or grenadian* or guam* or guatemala* or guyana* or guiana* or guyanese* or haiti* or hispaniola* or hondura* or hungary* or hungarian* or india* or indonesia* or iran* or iraq* or isle of man* or jamaica* or jordan* or kazakh* or kenya* or karabati* or korea* or kosovo* or kosova* or kyrgyz* or kirgiz* or kirghiz* or laos or lao or laotian* or latvia* or lebanon* or lebanese* or lesotho* or lesothan* or lesothonian* or basutoland* or mosotho* or basotho* or liberia* or libya* or jamahiriya* or lithuania* or macedonia* or madagasca* or malagasy* or malawi* or nyasaland* or malaysia* or malay* federation or maldives* or maldivian* or indian ocean or mali or malian* or "mali's" or malta or maltese* or "malta's" or micronesia* or marshallese* or kiribati* or marshall island* or nauru or nauran or nauruans or "naurian's" or mariana or marianas or palau or paluan* or tuvalu* or mauritania* or mauritan* or mauritius* or mexico* or mexican* or moldova* or moldovia* or mongol* or montenegr* or morocco* or moroccan* or ifni or mozambique* or mozambican* or myanmar* or burma* or burmese or namibia* or nepal* or new caledonia* or netherlands antill* or nicaragua* or niger* or oman or omani or omanis or "oman's" or pakistan* or palestin* or gaza* or west bank* or panama* or paraguay* or peru or peruvian* or "peru's" or philippine* or philipine* or phillipine* or phillippine* or filipino* or filipina* or poland* or polish or pole or poles or portugal* or portuguese or puerto ric* or romania* or russia* or ussr* or soviet* or rwanda* or rwandese or ruanda* or ruandese or samoa* or navigator island* or pacific island* or polynesia* or sao tome* or santomean* or saudi arabia* or saudi or saudis or senegal* or serbia* or seychell* or sierra leone* or slovak* or sloven* or melanesia* or solomon island* or norfolk island* or somali* or sri lanka* or ceylon* or saint kitts or st kitts or kittian* or nevisian* or saint lucia* or st lucia* or saint vincent* or st vincent* or vincentian* or grenadine* or sudan* or surinam* or syria* or tajik* or tadjik* or tadzhik* or tanzania* or tanganyika* or thai* or timor leste* or east timor* or timorese* or togo or togoles* or "togo's" or tonga* or trinidad* or tobago* or tunisia* or turkiy* or turkey* or turk or turks or turkish or turkmen* or uganda* or ukrain* or uruguay* or uzbek* or vanuatu* or new hebrides* or venezuela* or vietnam* or viet nam* or yemen* or yugoslav* or zambia* or zimbabwe* or rhodesia* or arab* countr* or middle east* or global south or sahara* or subsahara* or magreb* or maghrib* or west indies* or caribbean* or central america* or latin america* or south america* or asia central or central asia* or asia northern or north asia* or northern asia* or asia southeastern or southeastern asia* or south eastern asia* or southeast asia* or south east asia* or asia western or west asia* or western asia* or europe eastern or east europe* or eastern europe* or developing countr* or developing nation* or developing population* or developing world or less developed countr* or less developed nation* or less developed world or lesser developed countr* or lesser developed nation* or lesser developed world or under developed countr* or under developed nation* or under developed world or underdeveloped countr* or underdeveloped nation* or underdeveloped world or middle income countr* or middle income nation* or middle income population* or low income countr* or low income nation* or low income population* or lower income countr* or lower income nation* or lower income population* or underserved countr* or underserved nation* or underserved population* or under served population* or under served nation* or under served population* or deprived countr* or deprived population* or high burden countr* or high burden nation* or countdown countr* or countdown nation* or poor countr* or poor nation* or poor population* or poor world or poorer countr* or poorer nation* or poorer population* or poorer world or developing econom* or less developed econom* or underdeveloped econom* or under developed econom* or middle income econom* or low income econom* or lower income econom* or low gdp or low gnp or low gross domestic or low gross national or lower gdp or lower gnp or lower gross domestic or lower gross national or lmic or lmics or third world or lami countr* or transitional countr* or emerging econom* or emerging nation*).ti,ab. 
+2 | exp *cerebrovascular accident/ or exp *brain ischemia/ 
+3 | ("ischemic stroke" or "ischaemic stroke" or "cerebral infarction" or "brain ischemia" or "brain ischaemia" or "hemorrhagic stroke*" or "haemorrhagic stroke*").ti,ab. 
+4 | 2 or 3 
+5 | exp risk factor/ or primary prevention/ 
+6 | ("risk factor*" or prevention or burden*).ti,ab. 
+7 | 5 or 6 
+8 | exp case control study/ or exp cohort analysis/ or exp cross-sectional study/ 
+9 | exp "clinical trial (topic)"/ or exp randomized controlled trial/ or exp "controlled clinical trial"/ 
+10 | ("case control" or cohort or cross-sectional or crosssectional or "clinical trial" or (random* adj2 trial*) or RCT).ti,ab. 
+11 | 8 or 9 or 10 
+12 | 1 and 4 and 7 and 11 
+13 | limit 12 to (books or chapter or "clinical trial (clinicaltrials.gov)" or conference abstract or conference paper or "preprint (unpublished, non-peer reviewed)") 
+14 | 12 not 13 
+15 | (review or protocol).ti. 
+16 | "African American*".ti,ab. 
+17 | 14 not (15 or 16) 
+
+: Embase database search strategy {#tbl-embase-search}
+
+#### Ovid Medline
+
+The following search strategy was tested and used for the Ovid Medline database.
+
+**Step** | **Search**
+:--- | :---
+1 | (afghan* or africa* or albania* or algeria* or angola* or antigua* or barbuda* or argentin* or armenia* or aruba* or azerbaijan* or bahrain* or bangladesh* or bengal* or bangal* or barbados* or barbadian* or bajan or bajans or belarus* or belorus* or byelarus* or byelorus* or belize* or benin* or dahomey or bhutan* or bolivia* or bosnia* or herzegovin* or botswan* or batswan* or bechuanaland* or brazil* or brasil* or bulgaria* or burkina* or burkinese* or upper volta* or burundi* or urundi* or cabo verde* or cape verde* or cambodia* or kampuchea* or khmer* or cameroon* or cameroun* or ubangi shari* or chad* or chile* or china* or chinese or colombia* or comoro* or comore* or comorian* or mayotte* or congo* or zaire* or costa rica* or "cote d'ivoir*" or "cote d' ivoir*" or cote divoir* or cote d ivoir* or ivory coast* or ivorian* or croatia* or cuba or cuban or cubans or "cuba's" or cyprus* or cypriot* or czech* or djibouti* or french somaliland* or dominica* or ecuador* or egypt* or united arab republic* or el salvador* or salvadoran* or guinea* or equatoguinea* or eritrea* or estonia* or eswatini* or swaziland* or swazi* or swati* or ethiopia* or fiji* or gabon* or gabonese* or gabonaise* or gambia* or ((georgia or georgian or georgians) not (atlanta or california or florida)) or ghana* or gibraltar* or greece* or greek* or grecian* or grenada* or grenadian* or guam* or guatemala* or guyana* or guiana* or guyanese* or haiti* or hispaniola* or hondura* or hungary* or hungarian* or india* or indonesia* or iran* or iraq* or isle of man* or jamaica* or jordan* or kazakh* or kenya* or karabati* or korea* or kosovo* or kosova* or kyrgyz* or kirgiz* or kirghiz* or laos or lao or laotian* or latvia* or lebanon* or lebanese* or lesotho* or lesothan* or lesothonian* or basutoland* or mosotho* or basotho* or liberia* or libya* or jamahiriya* or lithuania* or macedonia* or madagasca* or malagasy* or malawi* or nyasaland* or malaysia* or malay* federation or maldives* or maldivian* or indian ocean or mali or malian* or "mali's" or malta or maltese* or "malta's" or micronesia* or marshallese* or kiribati* or marshall island* or nauru or nauran or nauruans or "naurian's" or mariana or marianas or palau or paluan* or tuvalu* or mauritania* or mauritan* or mauritius* or mexico* or mexican* or moldova* or moldovia* or mongol* or montenegr* or morocco* or moroccan* or ifni or mozambique* or mozambican* or myanmar* or burma* or burmese or namibia* or nepal* or new caledonia* or netherlands antill* or nicaragua* or niger* or oman or omani or omanis or "oman's" or pakistan* or palestin* or gaza* or west bank* or panama* or paraguay* or peru or peruvian* or "peru's" or philippine* or philipine* or phillipine* or phillippine* or filipino* or filipina* or poland* or polish or pole or poles or portugal* or portuguese or puerto ric* or romania* or russia* or ussr* or soviet* or rwanda* or rwandese or ruanda* or ruandese or samoa* or navigator island* or pacific island* or polynesia* or sao tome* or santomean* or saudi arabia* or saudi or saudis or senegal* or serbia* or seychell* or sierra leone* or slovak* or sloven* or melanesia* or solomon island* or norfolk island* or somali* or sri lanka* or ceylon* or saint kitts or st kitts or kittian* or nevisian* or saint lucia* or st lucia* or saint vincent* or st vincent* or vincentian* or grenadine* or sudan* or surinam* or syria* or tajik* or tadjik* or tadzhik* or tanzania* or tanganyika* or thai* or timor leste* or east timor* or timorese* or togo or togoles* or "togo's" or tonga* or trinidad* or tobago* or tunisia* or turkiy* or turkey* or turk or turks or turkish or turkmen* or uganda* or ukrain* or uruguay* or uzbek* or vanuatu* or new hebrides* or venezuela* or vietnam* or viet nam* or yemen* or yugoslav* or zambia* or zimbabwe* or rhodesia* or arab* countr* or middle east* or global south or sahara* or subsahara* or magreb* or maghrib* or west indies* or caribbean* or central america* or latin america* or south america* or asia central or central asia* or asia northern or north asia* or northern asia* or asia southeastern or southeastern asia* or south eastern asia* or southeast asia* or south east asia* or asia western or west asia* or western asia* or europe eastern or east europe* or eastern europe* or developing countr* or developing nation* or developing population* or developing world or less developed countr* or less developed nation* or less developed world or lesser developed countr* or lesser developed nation* or lesser developed world or under developed countr* or under developed nation* or under developed world or underdeveloped countr* or underdeveloped nation* or underdeveloped world or middle income countr* or middle income nation* or middle income population* or low income countr* or low income nation* or low income population* or lower income countr* or lower income nation* or lower income population* or underserved countr* or underserved nation* or underserved population* or under served population* or under served nation* or under served population* or deprived countr* or deprived population* or high burden countr* or high burden nation* or countdown countr* or countdown nation* or poor countr* or poor nation* or poor population* or poor world or poorer countr* or poorer nation* or poorer population* or poorer world or developing econom* or less developed econom* or underdeveloped econom* or under developed econom* or middle income econom* or low income econom* or lower income econom* or low gdp or low gnp or low gross domestic or low gross national or lower gdp or lower gnp or lower gross domestic or lower gross national or lmic or lmics or third world or lami countr* or transitional countr* or emerging econom* or emerging nation*).ti,ab. 
+2 | exp *Stroke/ 
+3 | ("ischemic stroke" or "ischaemic stroke" or "cerebral infarction" or "brain ischemia" or "brain ischaemia" or "hemorrhagic stroke*" or "haemorrhagic stroke*").ti,ab. 
+4 | 2 or 3 
+5 | exp Risk Factors/ or Primary Prevention/ 
+6 | ("risk factor*" or prevention or burden*).ti,ab. 
+7 | 5 or 6 
+8 | exp Case-Control Studies/ or exp Cohort Studies/ or Cross-Sectional Studies/ 
+9 | exp Clinical Trial/ or exp "Clinical Studies as Topic"/ 
+10 | ("case control" or cohort or cross-sectional or crosssectional or "clinical trial" or (random* adj2 trial*) or RCT).ti,ab. 
+11 | 8 or 9 or 10 
+12 | 1 and 4 and 7 and 11 
+13 | limit 12 to conference proceedings 
+14 | 12 not 13 
+15 | (review or protocol).ti. 
+16 | "African American*".ti,ab. 
+17 | 14 not (15 or 16) 
+
+: Ovid Medline database search strategy {tbl-medline-search}
+
+
+#### Global Health
+
+The following search strategy was tested and used for the Global Health database.
+
+**Step** | **Search**
+:--- | :---
+1 | (afghan* or africa* or albania* or algeria* or angola* or antigua* or barbuda* or argentin* or armenia* or aruba* or azerbaijan* or bahrain* or bangladesh* or bengal* or bangal* or barbados* or barbadian* or bajan or bajans or belarus* or belorus* or byelarus* or byelorus* or belize* or benin* or dahomey or bhutan* or bolivia* or bosnia* or herzegovin* or botswan* or batswan* or bechuanaland* or brazil* or brasil* or bulgaria* or burkina* or burkinese* or upper volta* or burundi* or urundi* or cabo verde* or cape verde* or cambodia* or kampuchea* or khmer* or cameroon* or cameroun* or ubangi shari* or chad* or chile* or china* or chinese or colombia* or comoro* or comore* or comorian* or mayotte* or congo* or zaire* or costa rica* or "cote d'ivoir*" or "cote d' ivoir*" or cote divoir* or cote d ivoir* or ivory coast* or ivorian* or croatia* or cuba or cuban or cubans or "cuba's" or cyprus* or cypriot* or czech* or djibouti* or french somaliland* or dominica* or ecuador* or egypt* or united arab republic* or el salvador* or salvadoran* or guinea* or equatoguinea* or eritrea* or estonia* or eswatini* or swaziland* or swazi* or swati* or ethiopia* or fiji* or gabon* or gabonese* or gabonaise* or gambia* or ((georgia or georgian or georgians) not (atlanta or california or florida)) or ghana* or gibraltar* or greece* or greek* or grecian* or grenada* or grenadian* or guam* or guatemala* or guyana* or guiana* or guyanese* or haiti* or hispaniola* or hondura* or hungary* or hungarian* or india* or indonesia* or iran* or iraq* or isle of man* or jamaica* or jordan* or kazakh* or kenya* or karabati* or korea* or kosovo* or kosova* or kyrgyz* or kirgiz* or kirghiz* or laos or lao or laotian* or latvia* or lebanon* or lebanese* or lesotho* or lesothan* or lesothonian* or basutoland* or mosotho* or basotho* or liberia* or libya* or jamahiriya* or lithuania* or macedonia* or madagasca* or malagasy* or malawi* or nyasaland* or malaysia* or malay* federation or maldives* or maldivian* or indian ocean or mali or malian* or "mali's" or malta or maltese* or "malta's" or micronesia* or marshallese* or kiribati* or marshall island* or nauru or nauran or nauruans or "naurian's" or mariana or marianas or palau or paluan* or tuvalu* or mauritania* or mauritan* or mauritius* or mexico* or mexican* or moldova* or moldovia* or mongol* or montenegr* or morocco* or moroccan* or ifni or mozambique* or mozambican* or myanmar* or burma* or burmese or namibia* or nepal* or new caledonia* or netherlands antill* or nicaragua* or niger* or oman or omani or omanis or "oman's" or pakistan* or palestin* or gaza* or west bank* or panama* or paraguay* or peru or peruvian* or "peru's" or philippine* or philipine* or phillipine* or phillippine* or filipino* or filipina* or poland* or polish or pole or poles or portugal* or portuguese or puerto ric* or romania* or russia* or ussr* or soviet* or rwanda* or rwandese or ruanda* or ruandese or samoa* or navigator island* or pacific island* or polynesia* or sao tome* or santomean* or saudi arabia* or saudi or saudis or senegal* or serbia* or seychell* or sierra leone* or slovak* or sloven* or melanesia* or solomon island* or norfolk island* or somali* or sri lanka* or ceylon* or saint kitts or st kitts or kittian* or nevisian* or saint lucia* or st lucia* or saint vincent* or st vincent* or vincentian* or grenadine* or sudan* or surinam* or syria* or tajik* or tadjik* or tadzhik* or tanzania* or tanganyika* or thai* or timor leste* or east timor* or timorese* or togo or togoles* or "togo's" or tonga* or trinidad* or tobago* or tunisia* or turkiy* or turkey* or turk or turks or turkish or turkmen* or uganda* or ukrain* or uruguay* or uzbek* or vanuatu* or new hebrides* or venezuela* or vietnam* or viet nam* or yemen* or yugoslav* or zambia* or zimbabwe* or rhodesia* or arab* countr* or middle east* or global south or sahara* or subsahara* or magreb* or maghrib* or west indies* or caribbean* or central america* or latin america* or south america* or asia central or central asia* or asia northern or north asia* or northern asia* or asia southeastern or southeastern asia* or south eastern asia* or southeast asia* or south east asia* or asia western or west asia* or western asia* or europe eastern or east europe* or eastern europe* or developing countr* or developing nation* or developing population* or developing world or less developed countr* or less developed nation* or less developed world or lesser developed countr* or lesser developed nation* or lesser developed world or under developed countr* or under developed nation* or under developed world or underdeveloped countr* or underdeveloped nation* or underdeveloped world or middle income countr* or middle income nation* or middle income population* or low income countr* or low income nation* or low income population* or lower income countr* or lower income nation* or lower income population* or underserved countr* or underserved nation* or underserved population* or under served population* or under served nation* or under served population* or deprived countr* or deprived population* or high burden countr* or high burden nation* or countdown countr* or countdown nation* or poor countr* or poor nation* or poor population* or poor world or poorer countr* or poorer nation* or poorer population* or poorer world or developing econom* or less developed econom* or underdeveloped econom* or under developed econom* or middle income econom* or low income econom* or lower income econom* or low gdp or low gnp or low gross domestic or low gross national or lower gdp or lower gnp or lower gross domestic or lower gross national or lmic or lmics or third world or lami countr* or transitional countr* or emerging econom* or emerging nation*).ti,ab. 
+2 | *cerebrovascular accident/ or *brain ischemia/ 
+3 | ("ischemic stroke" or "ischaemic stroke" or "cerebral infarction" or "brain ischemia" or "brain ischaemia" or "hemorrhagic stroke*" or "haemorrhagic stroke*" ).ti,ab. 
+4 | 2 or 3 
+5 | exp risk factor/ or primary prevention/ 
+6 | ("risk factor*" or prevention or burden*).ti,ab. 
+7 | 5 or 6 
+8 | exp case-control studies/ or exp cross-sectional studies/ or cohort studies.sh. 
+9 | exp "clinical trial (topic)"/ or exp randomized controlled trial/ or exp "controlled clinical trial"/ 
+10 | ("case control" or cohort or cross-sectional or crosssectional or "clinical trial" or (random* adj2 trial*) or RCT).ti,ab. 
+11 | 8 or 9 or 10 
+12 | 1 and 4 and 7 and 11 
+13 | limit 12 to ("books and documents" or preprint or "clinicaltrials.gov database" or conference proceedings) 
+14 | 12 not 13 
+15 | (review or protocol).ti. 
+16 | "African American*".ti,ab. 
+17 | 14 not (15 or 16) 
+
+: Global health database search strategy {#tbl-global-health-search}
+
+### Search results
+
+A abovementioned search strategy for each of the three OVID databases used for the search yielded a total of **`r nrow(search_full_raw)`** publications. The distribution of search results per database is shown in @tbl-search-results.
+
+```{r}
+#| label: tbl-search-results
+#| tbl-cap: Breakdown of search results by Ovid search database
+#| html-table-processing: none
+#| echo: false
+
+search_full_raw |>
+  dplyr::mutate(
+    database_name = dplyr::case_when(
+      grepl(pattern = "Embase", x = database) ~ "Embase",
+      grepl(pattern = "Global Health", x = database) ~ "Global Health",
+      grepl(pattern = "MEDLINE", x = database) ~ "Ovid Medline"
+    )
+  ) |>
+  dplyr::count(database_name) |>
+  knitr::kable(col.names = c("Database", "n")) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE
+  )
+```
+
+We then deduplicated the search results by performing fuzzy matching of the titles of the search results. After deduplication, **`r nrow(search_full_raw) - nrow(search_full_deduplicated)`** duplicates were removed bringing down the total of unique search results to **`r nrow(search_full_deduplicated)`**. @tbl-search-deduplicated-results shows the distribution of unique search results by database.
+
+```{r}
+#| label: tbl-search-deduplicated-results
+#| tbl-cap: Breakdown of deduplicated search results by Ovid search database
+#| html-table-processing: none
+#| echo: false
+
+search_full_deduplicated |>
+  dplyr::mutate(
+    database_name = dplyr::case_when(
+      grepl(pattern = "Embase", x = database) ~ "Embase",
+      grepl(pattern = "Global Health", x = database) ~ "Global Health",
+      grepl(pattern = "MEDLINE", x = database) ~ "Ovid Medline"
+    )
+  ) |>
+  dplyr::count(database_name) |>
+  knitr::kable(col.names = c("Database", "n")) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE
+  )
+```
+
+After deduplication, we checked for retracted papers and excluded them from the search results. We extracted the most up-to-date list of retracted papers from the [Retraction Watch](https://retractionwatch.com/) [database](https://gitlab.com/crossref/retraction-watch-data) and matched the original digital object identifier (DOI) of the retracted paper with the DOI in the search results data. A total of **`r nrow(search_full_deduplicated) - nrow(search_full_no_retractions)`** retracted papers were removed bringing down the total of unique search results to **`r nrow(search_full_no_retractions)`**.
+
+```{r}
+#| label: tbl-search-no-retraction-results
+#| tbl-cap: Breakdown of search results with no retracted papers by Ovid search database
+#| html-table-processing: none
+#| echo: false
+
+search_full_no_retractions |>
+  dplyr::mutate(
+    database_name = dplyr::case_when(
+      grepl(pattern = "Embase", x = database) ~ "Embase",
+      grepl(pattern = "Global Health", x = database) ~ "Global Health",
+      grepl(pattern = "MEDLINE", x = database) ~ "Ovid Medline"
+    )
+  ) |>
+  dplyr::count(database_name) |>
+  knitr::kable(col.names = c("Database", "n")) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE
+  )
+```
+
