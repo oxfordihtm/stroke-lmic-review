@@ -6,6 +6,13 @@ suppressPackageStartupMessages(source("packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 
 
+## Build options ----
+
+### Set Google credentials ----
+
+gargle::credentials_service_account(path = Sys.getenv("GOOGLE_AUTH_FILE"))
+
+
 ## Data targets ----
 data_targets <- tar_plan(
   tar_target(
@@ -40,7 +47,9 @@ data_targets <- tar_plan(
       path = retraction_watch_data_download_csv_file
     )
   )
-) 
+)
+
+
 ## Processing targets ----
 processing_targets <- tar_plan(
   tar_target(
@@ -65,15 +74,69 @@ processing_targets <- tar_plan(
     command = flatten_search(search_full_processed)
   ),
   tar_target(
-    name = search_full_processed_abridged,
-    command = search_full_processed |>
-      dplyr::select()
+    name = search_title,
+    command = get_title(search_full_processed)
+  ),
+  tar_target(
+    name = search_abstract,
+    command = get_abstract(search_full_processed)
   )
 )
 
 
-## LLM targets ----
-llm_targets <- tar_plan(
+prompt_targets <- tar_plan(
+  tar_target(
+    name = screening_context_prompt,
+    command = create_screening_context_prompt()
+  ),
+  tar_target(
+    name = screening_prompt,
+    command = create_screening_prompt(
+      search_title = search_title, search_abstract = search_abstract
+    )
+  )
+)
+
+## Gemini LLM targets ----
+gemini_targets <- tar_plan(
+  tar_target(
+    name = gemini_screen_primary,
+    command = gemini_screen_articles(
+      context = screening_context_prompt, query = screening_prompt
+    ),
+    pattern = map(screening_prompt)
+  ),
+  tar_target(
+    name = gemini_screen_primary_processed,
+    command = gemini_process_screening_primary(
+      search_df = search_full_processed, screen_results = gemini_screen_primary
+    )
+  ),
+  tar_target(
+    name = gemini_screen_primary_processed_flattened,
+    command = gemini_process_screening_primary(
+      search_df = search_full_processed_flattened, 
+      screen_results = gemini_screen_primary
+    )
+  )
+)
+
+## Ollama Gemma targets ----
+gemma_ollama_targets <- tar_plan(
+  gemma_model_latest = "gemma4",
+  # tar_target(
+  #   name = gemma_ollama_setup,
+  #   command = gemma_setup_model(model = gemma_model_latest)
+  # ),
+  tar_target(
+    name = gemma_screen_primary,
+    command = gemma_screen_articles(
+      model = gemma_model_latest,
+      context = screening_context_prompt, 
+      query = screening_prompt
+    ),
+    pattern = map(screening_prompt)
+  )
 )
 
 
@@ -95,13 +158,23 @@ output_targets <- tar_plan(
       df = search_full_processed_flattened,
       path = "data/search_full_processed_flattened.csv"
     )
+  ),
+  tar_target(
+    name = gemini_screen_primary_processed_flattened_csv,
+    command = output_csv_file(
+      df = gemini_screen_primary_processed_flattened,
+      path = "data/gemini_screen_primary_processed_flattened.csv"
+    )
   )
 )
 
 
 ## Reporting targets ----
 report_targets <- tar_plan(
-  
+  tar_quarto(
+    name = preliminary_report,
+    path = "reports/preliminary_report.qmd"
+  )
 )
 
 

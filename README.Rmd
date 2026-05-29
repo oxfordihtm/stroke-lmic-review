@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Mapping the Evidence Gaps for Stroke in Low and Middle-Income Countries
+# Mapping the Evidence Gaps for Stroke in Lower-Middle Income Countries (LMIC) and Low Income Countries (LIC)
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -20,7 +20,7 @@ This repository is a template for a [`docker`](https://www.docker.com/get-starte
 
 ## About the Project
 
-The burden of stroke is among the top five causes of mortality and morbidity in low and middle-income countries (LMICs) and this burden is growing, yet evidence on contributing causes and the efficacy of interventions appears to be disproportionately generated in high-income settings for discrete population groups. This review maps existing evidence drawing on LMIC populations.  
+The burden of stroke is among the top five causes of mortality and morbidity in low-middle income countries (LMICs) and low income countries (LICs) and this burden is growing, yet evidence on contributing causes and the efficacy of interventions appears to be disproportionately generated in high-income settings for discrete population groups. This review maps existing evidence drawing on LMIC and LIC populations.  
 
 ## Repository Structure
 
@@ -81,17 +81,23 @@ renv::restore()
 
 to install R package dependencies. This is only done once when the project is being initiated for the first time by a user.
 
-<!-- ### Encryption
+### Encryption
 
-This project uses encrypted environment variables and authentication keys for data retrieval managed using [`git-crypt`](https://github.com/AGWA/git-crypt). Collaborators will need to [install `git-crypt`](https://github.com/AGWA/git-crypt) and then provide their GPG key to the authors to be added as an authorised user within the repository. To get a GPG key, [download and install GPG](https://www.gnupg.org/download/) and then [generate your GPG key pair](https://www.gnupg.org/gph/en/manual/c14.html). Then provide your GPG key id to the authors.
+This project uses encrypted environment variables and authentication keys used to authenticate with the different services used by the project. These services include:
 
-Once given permission into the project and GPG key id added to the repository, update your local version of the repository by doing a `git pull` and then unlock the encrypted files/folders of the repository by running the following command in Terminal from within the project directory:
+* Large language models (LLMs) provided by [OpenAI](https://chatgpt.com/), [Anthropic](https://claude.ai/new), and [Google](https://gemini.google.com/); and,
+
+* [Sheets](https://sheets.google.com), [Drive](https://drive.google.com), and [Gmail](https://mail.google.com) services provided by [Google](https://www.google.com).
+
+Encryption is managed using [`git-crypt`](https://github.com/AGWA/git-crypt). Collaborators will need to [install `git-crypt`](https://github.com/AGWA/git-crypt) and then provide their GPG key to the repository administrators to be added as an authorised user within the repository. To get a GPG key, [download and install GPG](https://www.gnupg.org/download/) and then [generate your GPG key pair](https://www.gnupg.org/gph/en/manual/c14.html). Then provide your GPG key id to the authors.
+
+Once given permission into the project and GPG key id added to the repository, update your local version of the repository by doing a `git pull` and then unlock the encrypted files/folders of the repository by running the following command on the terminal from within the project directory:
 
 ```bash
 git-crypt unlock
 ```
 
-The encrypted components of the repository will now be decrypted and accessible for running the workflow (described below). -->
+The encrypted components of the repository will now be decrypted and accessible for running the workflow (described below).
 
 ### The workflow
 
@@ -122,4 +128,35 @@ or issue the following command in Terminal from within the project directory
 Rscript -e  "targets::tar_make()"
 ```
 
+## Authors and Contributors
 
+## Authors
+
+* Dr Minh Cong Tran
+* Dr Ernest Guevarra
+
+
+## Contributors
+
+* Dr Proochista Ariana
+* Dr Aisha Adamu
+* Dr Parinda Wattanasri
+* Dr Ainura Moldokmatova
+* Dr Chit Su Tinn
+* Dr Fona Qorina
+
+
+## License
+
+All code in this project is released under a [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.en.html#license-text) license. All text in this project is released under a [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/deed.en) license. All data is released under a [CC0](https://creativecommons.org/public-domain/cc0/) license.
+
+
+## Citation
+
+If you use the data provided through `seystats` in your work/research, please cite `seystats` along with all the sources of data that were used for curating the data available herewith. The suggested appropriate citation metadata is provided in [CITATION.cff](https://github.com/OxfordIHTM/seystats/blob/main/CITATION.cff).
+
+## Community guidelines
+
+Feedback, bug reports and feature requests are welcome; file issues or seek support [here](https://github.com/OxfordIHTM/stroke-lmic-review/issues). If you would like to contribute to the project, please see our [contributing guidelines](https://github.com/OxfordIHTM/stroke-lmic-review/blob/main/.github/CONTRIBUTING.md).
+
+This project is released with a [Contributor Code of Conduct](https://github.com/OxfordIHTM/stroke-lmic-review/blob/main/.github/CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.

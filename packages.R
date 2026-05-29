@@ -28,6 +28,12 @@ library(ellmer)
 library(ollamar)
 
 
+## Load packages for using Google ----
+
+library(gargle)
+library(googledrive)
+
+
 ## Load packages for OCR and PDF extraction ----
 
 library(pdftools)
@@ -36,6 +42,5 @@ library(tesseract)
 
 ## Load packages for working with bibliographies ----
 
-library(handlr)
 library(RefManageR)
 library(synthesisr)

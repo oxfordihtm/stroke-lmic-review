@@ -2,7 +2,7 @@
 #' Unlist and flatten processed search results to be compatible with CSV
 #' output
 #' 
-#' @param processed_df A `data.frame()`` object of the processed search output.
+#' @param processed_df A `data.frame()` object of the processed search output.
 #' 
 #' @returns A `tibble::tibble()`/`data.frame()` object of the flattened
 #'   processed search output.
