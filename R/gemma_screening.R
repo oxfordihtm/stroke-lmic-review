@@ -3,9 +3,7 @@
 #' 
 #' 
 
-gemma_screen_articles <- function(model, context, query) {
-  screen <- ellmer::chat_ollama(system_prompt = context, model = model)
-
+gemma_screen_articles <- function(gemma_reviewer, query) {
   type_classification <- ellmer::type_object(
     "A classification of journal articles on stroke",
     population = ellmer::type_boolean(
@@ -22,7 +20,7 @@ gemma_screen_articles <- function(model, context, query) {
     )
   )
 
-  out <- screen$chat_structured(query, type = type_classification)
+  out <- gemma_reviewer$chat_structured(query, type = type_classification)
 
   col_names <- names(out)
 
