@@ -1,6 +1,4 @@
 .env filter=git-crypt diff=git-crypt
 auth/**/* filter=git-crypt diff=git-crypt
 
-*.qmd linguist-detectable=true
-*.Rmd linguist-detectable=true
 *.html linguist-detectable=false
