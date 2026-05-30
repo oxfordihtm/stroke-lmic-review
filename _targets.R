@@ -121,17 +121,39 @@ gemini_targets <- tar_plan(
   )
 )
 
+
+## Claude LLM targets ----
+claude_targets <- tar_plan(
+  claude_model = "claude-opus-4-5-20251101",
+  tar_target(
+    name = claude_reviewer,
+    command = ellmer::chat_claude(
+      system_prompt = screening_context_prompt, model = claude_model
+    )
+  ),
+  tar_target(
+    name = claude_screen_primary,
+    command = claude_screen_articles(
+      claude_reviewer = claude_reviewer, query = screening_prompt
+    ),
+    pattern = map(screening_prompt)
+  )
+)
+
+
 ## Ollama Gemma targets ----
 gemma_ollama_targets <- tar_plan(
-  gemma_model_latest = "gemma4",
-  # tar_target(
-  #   name = gemma_ollama_setup,
-  #   command = gemma_setup_model(model = gemma_model_latest)
-  # ),
+  gemma_model = "gemma4:31b",
+  tar_target(
+    name = gemma_reviewer,
+    command = ellmer::chat_ollama(
+      system_prompt = screening_context_prompt, model = gemma_model
+    )
+  ),
   tar_target(
     name = gemma_screen_primary,
     command = gemma_screen_articles(
-      model = gemma_model_latest,
+      model = gemma_model,
       context = screening_context_prompt, 
       query = screening_prompt
     ),
