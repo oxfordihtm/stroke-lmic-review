@@ -108,13 +108,13 @@ gemini_targets <- tar_plan(
   ),
   tar_target(
     name = gemini_screen_primary_processed,
-    command = gemini_process_screening_primary(
+    command = process_screening_primary(
       search_df = search_full_processed, screen_results = gemini_screen_primary
     )
   ),
   tar_target(
     name = gemini_screen_primary_processed_flattened,
-    command = gemini_process_screening_primary(
+    command = process_screening_primary(
       search_df = search_full_processed_flattened, 
       screen_results = gemini_screen_primary
     )
@@ -137,6 +137,19 @@ claude_targets <- tar_plan(
       claude_reviewer = claude_reviewer, query = screening_prompt
     ),
     pattern = map(screening_prompt)
+  ),
+  tar_target(
+    name = claude_screen_primary_processed,
+    command = process_screening_primary(
+      search_df = search_full_processed, screen_results = claude_screen_primary
+    )
+  ),
+  tar_target(
+    name = claude_screen_primary_processed_flattened,
+    command = process_screening_primary(
+      search_df = search_full_processed_flattened, 
+      screen_results = claude_screen_primary
+    )
   )
 )
 
@@ -186,6 +199,13 @@ output_targets <- tar_plan(
     command = output_csv_file(
       df = gemini_screen_primary_processed_flattened,
       path = "data/gemini_screen_primary_processed_flattened.csv"
+    )
+  ),
+  tar_target(
+    name = claude_screen_primary_processed_flattened_csv,
+    command = output_csv_file(
+      df = claude_screen_primary_processed_flattened,
+      path = "data/claude_screen_primary_processed_flattened.csv"
     )
   )
 )
