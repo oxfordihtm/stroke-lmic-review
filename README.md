@@ -4,6 +4,12 @@
 # Mapping the Evidence Gaps for Stroke in Lower-Middle Income Countries (LMIC) and Low Income Countries (LIC)
 
 <!-- badges: start -->
+
+[![Project Status: WIP – Initial development is in progress, but there
+has not yet been a stable, usable release suitable for the
+public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![test targets
+workflow](https://github.com/OxfordIHTM/stroke-lmic-review/actions/workflows/test-targets-workflow.yml/badge.svg)](https://github.com/OxfordIHTM/stroke-lmic-review/actions/workflows/test-targets-workflow.yml)
 <!-- badges: end -->
 
 This repository is a template for a
@@ -158,29 +164,38 @@ graph LR
     direction LR
     x39d4d013227f0dc3(["claude_model"]):::skipped --> x6370852b85c7e5e4(["claude_reviewer"]):::skipped
     x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> x6370852b85c7e5e4(["claude_reviewer"]):::skipped
-    x6370852b85c7e5e4(["claude_reviewer"]):::skipped --> xed2aacb6fec7bf88["claude_screen_primary"]:::dispatched
-    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xed2aacb6fec7bf88["claude_screen_primary"]:::dispatched
-    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::queued
+    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xed2aacb6fec7bf88["claude_screen_primary"]:::skipped
+    x6370852b85c7e5e4(["claude_reviewer"]):::skipped --> xed2aacb6fec7bf88["claude_screen_primary"]:::skipped
+    xed2aacb6fec7bf88["claude_screen_primary"]:::skipped --> x6f6e8203fc71af0c(["claude_screen_primary_processed"]):::queued
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x6f6e8203fc71af0c(["claude_screen_primary_processed"]):::queued
+    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> x507b3709952dd3c2(["claude_screen_primary_processed_flattened"]):::completed
+    xed2aacb6fec7bf88["claude_screen_primary"]:::skipped --> x507b3709952dd3c2(["claude_screen_primary_processed_flattened"]):::completed
+    x507b3709952dd3c2(["claude_screen_primary_processed_flattened"]):::completed --> xda28e7c56de07219(["claude_screen_primary_processed_flattened_csv"]):::queued
+    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xa7cacf98a8901b23(["deepseek_reviewer"]):::queued
+    x22ff41defec165cc(["deepseek_model"]):::queued --> xa7cacf98a8901b23(["deepseek_reviewer"]):::queued
+    xa7cacf98a8901b23(["deepseek_reviewer"]):::queued --> x1cd58d886269795c["deepseek_test_screen_primary"]:::queued
+    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> x1cd58d886269795c["deepseek_test_screen_primary"]:::queued
     xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::queued
+    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::queued
     xf0985b06dbe6e89a["gemini_screen_primary"]:::queued --> x3dbfbc99d94452b0(["gemini_screen_primary_processed"]):::queued
     xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x3dbfbc99d94452b0(["gemini_screen_primary_processed"]):::queued
     xf0985b06dbe6e89a["gemini_screen_primary"]:::queued --> x00c1b0b88ef93218(["gemini_screen_primary_processed_flattened"]):::queued
-    xd596227685e2e430(["search_full_processed_flattened"]):::queued --> x00c1b0b88ef93218(["gemini_screen_primary_processed_flattened"]):::queued
+    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> x00c1b0b88ef93218(["gemini_screen_primary_processed_flattened"]):::queued
     x00c1b0b88ef93218(["gemini_screen_primary_processed_flattened"]):::queued --> x3da0672e497133c7(["gemini_screen_primary_processed_flattened_csv"]):::queued
     xfac2732c01b1bb30(["gemma_model"]):::queued --> xeb04618c59839428(["gemma_reviewer"]):::queued
     x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xeb04618c59839428(["gemma_reviewer"]):::queued
-    xfac2732c01b1bb30(["gemma_model"]):::queued --> x4979191191b66b4d["gemma_screen_primary"]:::queued
     x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> x4979191191b66b4d["gemma_screen_primary"]:::queued
+    xfac2732c01b1bb30(["gemma_model"]):::queued --> x4979191191b66b4d["gemma_screen_primary"]:::queued
     xf493b7d472ff5e59(["screening_prompt"]):::skipped --> x4979191191b66b4d["gemma_screen_primary"]:::queued
-    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
-    xd596227685e2e430(["search_full_processed_flattened"]):::queued --> xf73bae7f10e0156f(["preliminary_report"]):::queued
-    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
-    x2f7fdb4e976b16f9(["search_full_raw"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
-    xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
     x971c8918645ea4f3(["search_abstract"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
-    x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
     x4946600ed43ea69a(["search_title"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    x2f7fdb4e976b16f9(["search_full_raw"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
     xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
     xb4a9c9edd73bec9b(["retraction_watch_data_download_csv_file"]):::skipped --> x71f5d31f85b83ceb(["retraction_watch_data"]):::skipped
     xe03e263fab696ab7(["retraction_watch_data_url"]):::skipped --> xb4a9c9edd73bec9b(["retraction_watch_data_download_csv_file"]):::skipped
     x188aa7ffce88bb98(["ris_file_paths"]):::skipped --> x6ba4c23c2738dda8["ris_all"]:::skipped
@@ -189,11 +204,11 @@ graph LR
     x971c8918645ea4f3(["search_abstract"]):::skipped --> xf493b7d472ff5e59(["screening_prompt"]):::skipped
     xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x971c8918645ea4f3(["search_abstract"]):::skipped
     x2f7fdb4e976b16f9(["search_full_raw"]):::skipped --> x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped
-    x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped
     x71f5d31f85b83ceb(["retraction_watch_data"]):::skipped --> xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped
+    x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped
     xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> xcf6ddd66dde32d43(["search_full_processed"]):::skipped
-    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xd596227685e2e430(["search_full_processed_flattened"]):::queued
-    xd596227685e2e430(["search_full_processed_flattened"]):::queued --> x4b455536a354b302(["search_full_processed_flattened_csv"]):::queued
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xd596227685e2e430(["search_full_processed_flattened"]):::skipped
+    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> x4b455536a354b302(["search_full_processed_flattened_csv"]):::queued
     x4b7fcdd63fd7fb9a(["ris_all_file"]):::skipped --> x2f7fdb4e976b16f9(["search_full_raw"]):::skipped
     x188aa7ffce88bb98(["ris_file_paths"]):::skipped --> xfda738880e222baf["search_full_ris"]:::queued
     xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x4946600ed43ea69a(["search_title"]):::skipped
@@ -219,17 +234,23 @@ Rscript -e  "targets::tar_make()"
 
 ## Authors
 
-- Dr Minh Cong Tran
-- Dr Ernest Guevarra
+- [Dr Minh Cong
+  Tran](https://www.globalhealth.ox.ac.uk/our-researchers/minh-tran)
+- [Dr Ernest Guevarra](https://ernest.guevarra.io)
 
 ## Contributors
 
-- Dr Proochista Ariana
-- Dr Aisha Adamu
-- Dr Parinda Wattanasri
-- Dr Ainura Moldokmatova
-- Dr Chit Su Tinn
+- [Dr Aisha
+  Adamu](https://www.tropicalmedicine.ox.ac.uk/team/aisha-adamu)
+- [Dr Parinda
+  Wattanasri](https://www.tropicalmedicine.ox.ac.uk/news/parinda-wattanasri-ihtm-2019-digital-vaccine-passports-in-thailand)
+- [Dr Ainura
+  Moldokmatova](https://www.tropicalmedicine.ox.ac.uk/team/ainura-moldokmatova)
+- [Dr Chit Su
+  Tinn](https://www.globalhealth.ox.ac.uk/our-researchers/chit-su-tinn)
 - Dr Fona Qorina
+- [Dr Proochista
+  Ariana](https://www.ndm.ox.ac.uk/team/proochista-ariana)
 
 ## License
 
@@ -242,11 +263,10 @@ license. All data is released under a
 
 ## Citation
 
-If you use the data provided through `seystats` in your work/research,
-please cite `seystats` along with all the sources of data that were used
-for curating the data available herewith. The suggested appropriate
-citation metadata is provided in
-[CITATION.cff](https://github.com/OxfordIHTM/seystats/blob/main/CITATION.cff).
+If you use the code, text, and/or data provided in this repository in
+your work/research, please cite this work using the suggested
+appropriate citation provided in
+[CITATION.cff](https://github.com/OxfordIHTM/stroke-lmic-review/blob/main/CITATION.cff).
 
 ## Community guidelines
 
