@@ -14,6 +14,8 @@ knitr::opts_chunk$set(
 # Mapping the Evidence Gaps for Stroke in Lower-Middle Income Countries (LMIC) and Low Income Countries (LIC)
 
 <!-- badges: start -->
+[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![test targets workflow](https://github.com/OxfordIHTM/stroke-lmic-review/actions/workflows/test-targets-workflow.yml/badge.svg)](https://github.com/OxfordIHTM/stroke-lmic-review/actions/workflows/test-targets-workflow.yml)
 <!-- badges: end -->
 
 This repository is a template for a [`docker`](https://www.docker.com/get-started)-containerised, [`{targets}`](https://docs.ropensci.org/targets/)-based, [`{renv}`](https://rstudio.github.io/renv/articles/renv.html)-enabled [`R`](https://cran.r-project.org/) workflow for mapping the evidence gaps for stroke in low and middle-income countries.
@@ -132,18 +134,18 @@ Rscript -e  "targets::tar_make()"
 
 ## Authors
 
-* Dr Minh Cong Tran
-* Dr Ernest Guevarra
+* [Dr Minh Cong Tran](https://www.globalhealth.ox.ac.uk/our-researchers/minh-tran)
+* [Dr Ernest Guevarra](https://ernest.guevarra.io)
 
 
 ## Contributors
 
-* Dr Proochista Ariana
-* Dr Aisha Adamu
-* Dr Parinda Wattanasri
-* Dr Ainura Moldokmatova
-* Dr Chit Su Tinn
+* [Dr Aisha Adamu](https://www.tropicalmedicine.ox.ac.uk/team/aisha-adamu)
+* [Dr Parinda Wattanasri](https://www.tropicalmedicine.ox.ac.uk/news/parinda-wattanasri-ihtm-2019-digital-vaccine-passports-in-thailand)
+* [Dr Ainura Moldokmatova](https://www.tropicalmedicine.ox.ac.uk/team/ainura-moldokmatova)
+* [Dr Chit Su Tinn](https://www.globalhealth.ox.ac.uk/our-researchers/chit-su-tinn)
 * Dr Fona Qorina
+* [Dr Proochista Ariana](https://www.ndm.ox.ac.uk/team/proochista-ariana)
 
 
 ## License
@@ -153,7 +155,8 @@ All code in this project is released under a [GPL-3.0](https://www.gnu.org/licen
 
 ## Citation
 
-If you use the data provided through `seystats` in your work/research, please cite `seystats` along with all the sources of data that were used for curating the data available herewith. The suggested appropriate citation metadata is provided in [CITATION.cff](https://github.com/OxfordIHTM/seystats/blob/main/CITATION.cff).
+If you use the code, text, and/or data provided in this repository in your work/research, please cite this work using the suggested appropriate citation provided in [CITATION.cff](https://github.com/OxfordIHTM/stroke-lmic-review/blob/main/CITATION.cff).
+
 
 ## Community guidelines
 
