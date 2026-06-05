@@ -27,11 +27,20 @@ author:
         postal-code: OX1 3SY
         url: https://www.tropicalmedicine.ox.ac.uk/study-with-us/msc-ihtm
 date: "`r format(Sys.Date(), '%d %B %Y')`"
+
+bibliography:
+  - references.bib
+  - packages.bib
+csl: nature.csl
+
+lightbox: auto
+
 format: 
   html:
     toc: true
     toc-location: left
     embed-resources: true
+    mermaid-format: png
     grid:
       body-width: 900px
       margin-width: 300px
@@ -47,14 +56,16 @@ for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 
 targets::tar_load(
   c(
-    search_full_raw, search_full_deduplicated, search_full_no_retractions, search_full_processed, search_full_processed_flattened, 
-    search_title, search_abstract, screening_context_prompt, screening_prompt#,
-    #gemini_screen_primary
+    search_full_raw, search_full_deduplicated, search_full_no_retractions, 
+    search_full_processed, search_full_processed_flattened, 
+    search_title, search_abstract, screening_context_prompt, screening_prompt,
+    gemini_screen_primary, claude_screen_primary, 
+    gemini_screen_primary_processed, claude_screen_primary_processed
   )
 )
 ```
 
-This report outlines the different steps undertaken to perform a large language model (LLM)-assisted screening of search results for the **scoping review on stroke in lower-middle income countries (LMIC) and low income countries (LIC)** and their corresponding results/outcomes. The methods and results described in this report contribute to the overall project on **Mapping the Evidence Gaps for Stroke in Lower-Middle Income Countries (LMIC) and Low Income Countries (LIC)**.
+This report outlines the different steps undertaken by the authors starting on the 21st of May 2026 up to the 29th of May 2026 to perform a preliminary demonstration of large language model (LLM)-assisted screening of search results for the **scoping review on stroke in lower-middle income countries (LMIC) and low income countries (LIC)** and their corresponding results/outcomes. The methods and results described in this report contribute to the overall project on **Mapping the Evidence Gaps for Stroke in Lower-Middle Income Countries (LMIC) and Low Income Countries (LIC)**.
 
 ## The search
 
@@ -69,6 +80,8 @@ Relevant studies were identified based on the following inclusion criteria that 
 **Context** | Geographic setting: LMIC, LIC | Geographic setting: HIC 
 **Publication type** | Primary studies: cohort, case-control, cross-sectional, and interventional studies | grey literature (reports, conference materials), secondary research (reviews), study protocols, modelling studies, cost of illness studies, case series/reports, and editorials
 **Language** | All languages (no limit to English) | N/A
+
+: The population-concept-context framework describing the inclusion and exclusion criteria for the scoping review {tbl-pcc}
 
 ### Search strategy
 
@@ -159,7 +172,21 @@ The following search strategy was tested and used for the Global Health database
 
 ### Search results
 
-A abovementioned search strategy for each of the three OVID databases used for the search yielded a total of **`r nrow(search_full_raw)`** publications. The distribution of search results per database is shown in @tbl-search-results.
+A abovementioned search strategy for each of the three Ovid databases used for the search yielded a total of **`r nrow(search_full_raw)`** publications. These results were exported from Ovid as Research Information Systems (RIS) files, plain text bibliographic data files that uses stanardised two-letter tags for bibliographic metadata fields. Ovid only allowed for batch export of 2000 search results at a time hence 6 RIS files were exported namely
+
+```{r}
+#| echo: false
+
+list.files("data-raw")
+```
+
+These search results RIS files can be accessed from <https://github.com/OxfordIHTM/stroke-lmic-review/tree/main/data-raw>.
+
+We used R language for statistical computing [@rstats] for all the processing of the bibliographic data. We read these RIS files into R as plain text files and concatenated them into a single RIS file which can be accessed at <https://raw.githubusercontent.com/OxfordIHTM/stroke-lmic-review/refs/heads/main/data/search_all.ris>.
+
+Using the `synthesisr` R package [@synthesisr], we read and transformed the overall RIS file into a single tabular data structure with standardised bibliofgraphic metadata fields so that we can perform further transformations, processing, and descriptive analysis of the search results data.
+
+The distribution of search results per database is shown in @tbl-search-results.
 
 ```{r}
 #| label: tbl-search-results
@@ -183,7 +210,10 @@ search_full_raw |>
   )
 ```
 
-We then deduplicated the search results by performing fuzzy matching of the titles of the search results. After deduplication, **`r nrow(search_full_raw) - nrow(search_full_deduplicated)`** duplicates were removed bringing down the total of unique search results to **`r nrow(search_full_deduplicated)`**. @tbl-search-deduplicated-results shows the distribution of unique search results by database.
+
+#### Deduplication and removal of retracted papers
+
+We then deduplicated the search results by performing fuzzy matching of the titles of the search results using the `synthesisr` R package [@synthesisr]. After deduplication, **`r nrow(search_full_raw) - nrow(search_full_deduplicated)`** duplicates were removed bringing down the total of unique search results to **`r nrow(search_full_deduplicated)`**. @tbl-search-deduplicated-results shows the distribution of unique search results by database.
 
 ```{r}
 #| label: tbl-search-deduplicated-results
@@ -230,4 +260,393 @@ search_full_no_retractions |>
     full_width = FALSE
   )
 ```
+
+
+### Exploration of the final search results
+
+In this section, we perform exploratory data analysis of the full deduplicated and processed search results (with retracted papers removed) focusing on key characteristics relevant to the scoping review specifically with regard to the effectiveness of the search strategy implemented.
+
+#### Articles by database source and year of publication
+
+The primary search results show a steady increase of published articles over time with the most being published in 2025. Note that this is publication year rather than when the actual study was conducted so give or take these studies may have been conducted 2-3 years before. There is a spike in the number of published articles in 2025. The results for 2026 is roughly for articles published in the first quarter of the year but it is already roughly the same number of published articles for the whole year of 2012. Medline was the predominant source of journal articles for the primary search results.
+
+```{r}
+#| label: fig-articles-by-database-year
+#| fig-cap: Number of articles by database source and year of publication
+#| fig-height: 8
+#| fig-width: 10
+#| echo: false
+
+df <- search_full_processed |>
+  dplyr::mutate(
+    dbname = dplyr::case_when(
+      grepl(pattern = "MEDLINE", x = database) ~ "Medline",
+      grepl(pattern = "Embase", x = database) ~ "Embase",
+      .default = database
+    ),
+    year = factor(x = year, levels = min(year):max(year))
+  ) |>
+  dplyr::count(dbname, year) |>
+  tidyr::complete(dbname, year, fill = list(n = 0))
+
+df |>
+  dplyr::filter(!is.na(year)) |>
+  ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = n, fill = dbname)) +
+  ggplot2::geom_col(
+    position = "stack",
+    alpha = 0.7
+  ) +
+  ggplot2::scale_fill_manual(
+    name = "Database",
+    values = oxthema::get_oxford_colours(
+      pattern = "Oxford green|ocean grey|ochre"
+    )
+  ) +
+  ggplot2::scale_y_continuous(breaks = seq(from = 0, to = 1000, by = 100)) +
+  oxthema::theme_oxford(grid = "Yy", axis_text_size = 10) +
+  ggplot2::theme(
+    axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1),
+    legend.position = "top"
+  )
+```
+
+#### Articles by database and publication type
+
+The metadata provided by the RIS files includes publication type. @fig-articles-by-database-pubtype shows the number of articles by database source and publication type. We notice here that there is no standard ontology for the reported values in this metadata field between Embase, Global Health, and Medline and within the same database. It is likely that the terms used for this metadata is dictated by the journal and what the topics that the specific journal focuses on. Our key finding from this exploration is that we noticed the following publication types:
+
+- Review
+- Systematic Review
+- Research Support
+- Preprint
+- Practice Guideline
+- Network Meta-analysis
+- Meta-analysis
+- Letter
+- Lecture
+- Erratum
+- Editorial
+- Correspondence
+- Consensus statement
+- Conference review
+- Conference paper
+- Conference abstract
+- Comment
+- Articles in press
+
+These types of publications are not within the inclusion criteria set for the scoping review. Of these
+
+- close to 900 are conference papers/reviews/abstracts and mostly from the Embase database
+- close to 300 are reviews, systematic reviews, meta-analysis
+
+```{r}
+#| label: fig-articles-by-database-pubtype
+#| fig-cap: Number of articles by database source and publication type
+#| fig-height: 12
+#| fig-width: 10
+#| echo: false
+
+df <- search_full_processed |>
+  dplyr::mutate(
+    dbname = dplyr::case_when(
+      grepl(pattern = "MEDLINE", x = database) ~ "Medline",
+      grepl(pattern = "Embase", x = database) ~ "Embase",
+      .default = database
+    ),
+    year = factor(x = year, levels = min(year):max(year))
+  ) |>
+  tidyr::unnest(publication_type) |>
+  dplyr::count(dbname, publication_type)
+
+df |>
+  ggplot2::ggplot(
+    mapping = ggplot2::aes(x = n, y = publication_type, fill = dbname)
+  ) +
+  ggplot2::geom_col(
+    position = "stack",
+    alpha = 0.7
+  ) +
+  ggplot2::scale_fill_manual(
+    name = "Database",
+    values = oxthema::get_oxford_colours(
+      pattern = "Oxford green|ocean grey|ochre"
+    )
+  ) +
+  ggplot2::scale_x_continuous(breaks = seq(from = 0, to = 10000, by = 200)) +
+  oxthema::theme_oxford(grid = "Xx", axis_text_size = 10) +
+  ggplot2::theme(
+    axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1),
+    legend.position = "top"
+  )
+```
+
+## The screening
+
+Using the final set of **`r nrow(search_full_no_retractions)`** articles, we setup a computational workflow in R that uses large language models to perform a primary screening of the outputs of the search to verify whether or not the articles meet the specified inclusion and exclusion criteria for this scoping review.
+
+### The models
+
+For this initial exploration step, we used two frontier large language model (LLM) service providers namely Google with their Gemini model and Anthropic with their Claude Opus model. Below are the specific models that we used:
+
+**Provider** | **Model Name**
+:---         | :---
+Google       | Gemini 2.5 flash
+Anthropic    | Claude Opus 4.5
+
+: Frontier large language models used for the primary screening {#tbl-frontier-llm-used}
+
+The choice of these models were partly convenience as we already had paid access to one of them (Google Gemini) and Anthropic Claude had a relatively straightforward application programming interface (API) approach to interfacing with their models.
+
+We wanted to use frontier models for the initial testing as these are the ones that most people are aware of and are the ones to which other models are compared against. If others were to replicate/reproduce our work, accessing these frontier models would be relatively straightforward. Use of these frontier models will also allow us to calculate real-world costs of performing this LLM-powered screening of journal articles.
+
+For Google Gemini, we used a Google Workspace business account within which we created a project specific for this scoping review. Under this project, we enabled API services for Google AI and Google Cloud. We then created a service account credential which we used for authenticating our programmatic API calls to Google Gemini. This is the recommended best practice for authenticating with Google API services in general and the recommended approach for production-level Google Gemini API calls.
+
+For Anthropic Claude, we created a pre-paid Claude Platform account in order to create an API key to use with our API calls to Anthropic's Claude Opus 4.5.
+
+For both these services, we chose the accounts and services that didn't send our input data back to the LLM provider to use for training their models.
+
+### The workflow
+
+We developed a [`{targets}`](https://docs.ropensci.org/targets/)[@targets]-based and [`{renv}`](https://rstudio.github.io/renv/articles/renv.html)[@renv]-enabled [`R`](https://cran.r-project.org/) workflow that used LLMs to initially screen the title and abstract of the final search results to determine whether they meet the inclusion and exclusion criteria of the scoping review.
+
+We used the `ellmer` R package [@ellmer] to interface programmatically with Google Gemini and Anthropic Claude Opus models. We provided each LLM with the same contextual prompt as follows:
+
+> "You are a classifier of research studies on stroke for the purpose of a scoping review. You determine based on the title and abstract of a research study whether it is to be included in the scoping review based on the following criteria. First criteria is that the study should be on a population of age 18 years and older. Second criteria is that the study should be on a population living in lower-middle income (LMIC) or low income countries (LIC) based on the most recent World Bank country classification by income level. Third criteria is that the study should be regarding stroke burden (such as prevalence, incidence, disability-adjusted life years, quality-adjusted life years, disability, death, hospitalisation) OR types of stroke (such as ischaemic stroke, haemorrhagic stroke) OR risk factors for stroke OR interventions for stroke. Fourth criteria is that the study should be based on primarily collected data with a research design such as a cohort study, case-control study, cross-sectional study, or interventional studies. The studies cannot be reports, conference materials, reviews, study protocols, modelling studies, cost of illness studies, case series, case reports, and editorials."
+
+After laying down this context, we then prompted each LLM with the title and abstract of each of the **`r nrow(search_full_no_retractions)`** articles in the final search results. This secondary prompt was provided to each model sequentially to avoid known issue of order effect or prompt ordering sensitivity related to recency bias or anchoring phenomenon. By prompting sequentially, each provision of title and abstract to the model is a fresh instance of interaction with the model.
+
+In addition to the title and abstract, we provided the LLM instructions on the structure of the response that we wanted. Specifically, we instructed the LLM to output a value of TRUE or FALSE for each of the four inclusion criteria to correspond to whether the article based on the title and abstract meets the criteria. The workflow concatenates the LLM response for each title and abstract prompt into a table like that shown in @tbl-template-llm-output below:
+
+
+|**population** | **geography** | **publication_type** | **topic**|
+|:--------------|:--------------|:---------------------|:---------|
+|               |               |                      |          |
+|               |               |                      |          |
+|               |               |                      |          |
+|               |               |                      |          |
+
+: Data structure of LLM output {#tbl-template-llm-output} 
+
+where **population** is for whether the study population is for adults (age >= 18 years old), **geography** is for whether the location where the study is conducted and the country where the study participants are from is LMIC or LIC by World Bank country classification, **publiation_type** is for whether the type of study is as specified in the inclusion criteria, and **topic** for whether the study is for stroke-relevant topics specified in the inclusion criteria.
+
+Once the LLM has completed reviewing each of the **`r nrow(search_full_no_retractions)`** articles in our full search, the workflow then concatenates the LLM outputs with the final search results table. A final variable is created that determines whether the article should be included to the next stage of the scoping review. A study is included to the next stage of the scoping review if all the results for the **population**, **geography**, **publication_type**, and **topic** are TRUE.
+
+This entire workflow is documented in R code and the current version (v0.0.0.9000) which this preliminary report is based on can be reviewed at <https://github.com/OxfordIHTM/stroke-lmic-review>.
+
+@fig-workflow-diagram is a diagram flowchart of the entire workflow (from data ingest to LLM screening)
+
+```{r}
+#| results: asis
+#| echo: false
+
+cat(
+  c(
+    "```{mermaid}",
+    "%%| label: fig-workflow-diagram",
+    "%%| fig-cap: Diagram of the LLM article screening workflow",
+    "%%| fig-height: 10",
+    targets::tar_mermaid(
+      targets_only = TRUE, outdated = FALSE, legend = FALSE, color = FALSE
+    ),
+    "```"
+  ),
+  sep = "\n"
+)
+```
+
+### The results
+
+A total of **`r nrow(gemini_screen_primary_processed[gemini_screen_primary_processed$include_primary, ])`** (**`r scales::label_percent(accuracy = 0.1)((nrow(gemini_screen_primary_processed[gemini_screen_primary_processed$include_primary, ]) / nrow(gemini_screen_primary_processed)))`**) articles were classified by Google Gemini as meeting all 4 inclusion criteria of the review. On the other hand, Anthropic Claude Opus classified **`r nrow(claude_screen_primary_processed[claude_screen_primary_processed$include_primary, ])`** (**`r scales::label_percent(accuracy = 0.1)((nrow(claude_screen_primary_processed[claude_screen_primary_processed$include_primary, ]) / nrow(claude_screen_primary_processed)))`**) articles as meeting all 4 inclusion criteria.
+
+For both models, the primary driver for an article being excluded is the geographic location criteria. Also, the majority of the difference in number of articles included into the review between the two models is explained by the difference in the numer of articles classified by Google Gemini as meeting criteria on geography compared to those classified by Anthropic Claude Opus (see @fig-llm-screening-results).
+
+```{r}
+#| label: fig-llm-screening-results
+#| fig-cap: LLM screening responses by model, criteria, and overall
+#| fig-height: 6
+#| fig-width: 10
+#| echo: false
+
+gemini_results <- gemini_screen_primary_processed |>
+  dplyr::select(population, geography, type, topic, include_primary) |>
+  tidyr::pivot_longer(
+    cols = population:include_primary, 
+    names_to = "criteria", values_to = "response"
+  ) |>
+  dplyr::mutate(
+    criteria = factor(
+      x = criteria, 
+      levels = c("population", "geography", "type", "topic", "include_primary")
+    )
+  ) |>
+  dplyr::count(criteria, response) |>
+  dplyr::mutate(model = "gemini", .before = criteria)
+  
+claude_results <- claude_screen_primary_processed |>
+  dplyr::select(population, geography, type, topic, include_primary) |>
+  tidyr::pivot_longer(
+    cols = population:include_primary, 
+    names_to = "criteria", values_to = "response"
+  ) |>
+  dplyr::mutate(
+    criteria = factor(
+      x = criteria, 
+      levels = c("population", "geography", "type", "topic", "include_primary")
+    )
+  ) |>
+  dplyr::count(criteria, response) |>
+  dplyr::mutate(model = "claude opus", .before = criteria)
+
+combined_results <- rbind(gemini_results, claude_results)
+  
+combined_results  |>
+  ggplot2::ggplot(mapping = ggplot2::aes(x = criteria, y = n, fill = response)) +
+  ggplot2::geom_col(position = "stack", stat = "identity", alpha = 0.7) +
+  ggplot2::scale_fill_manual(
+    values = oxthema::get_oxford_colours(pattern = "mauve|peach")
+  ) +
+  ggplot2::facet_wrap(. ~ model, ncol = 2) +
+  oxthema::theme_oxford(grid = "Yy", axis_text_size = 10) +
+  ggplot2::theme(legend.position = "top")
+```
+
+@tbl-tbl-results-by-criteria-combination below show the distribution of the screening results by combination of responses to the each of the four criteria. We see that both Google Gemini and Anthropic Claude Opus models excluded the most journal articles based on the geography criteria.
+
+```{r}
+#| label: tbl-results-by-criteria-combination
+#| tbl-cap: Distribution of criteria results combination
+#| echo: false
+#| html-table-processing: none
+
+gemini <- gemini_screen_primary_processed |>
+  dplyr::select(population, geography, type, topic, include_primary) |>
+  dplyr::mutate(
+    model = "gemini", .before = population
+  )
+
+claude <- claude_screen_primary_processed |>
+  dplyr::select(population, geography, type, topic, include_primary) |>
+  dplyr::mutate(
+    model = "claude-opus", .before = population
+  )
+
+model_results_df <- rbind(gemini, claude)
+
+
+model_results_df |>
+  dplyr::count(model, population, geography, type, topic) |>
+  dplyr::group_by(model) |>
+  dplyr::arrange(desc(n), .by_group = TRUE) |>
+  knitr::kable() |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("bordered", "striped"), full_width = FALSE
+  ) |>
+  kableExtra::collapse_rows(columns = 1, valign = "top")
+```
+
+#### Model performance
+
+A key output that we need to measure is how well the models performed in this journal article screening task. This is still something that we are developing and early discussions revolve around comparing the LLM results with that of the human reviewers as gold standard. For this we can potentially treat this analysis similar to a new diagnostic test being compared to the gold standard and then calculating different metrics such as sensitivity and specificity. We can also explore metrics of accuracy and precision of the results provided by the LLMs again using the human reviewers' results as the gold standard.
+
+For this preliminary report, we focus on ***prompt performance*** as a proxy of model performance. Because these first steps that we are doing are primarily to map out the workflow for LLM-aided screening of journal articles for a scoping review, we wanted to use the results from this first run to inform and improve the prompts that we are provided the LLMs. To do this, we basically selected the first 20 titles and abstracts and reviewed the results provided by the LLMs and then compared this to the results we would have given to these articles for each of the criteria.
+
+We have yet to organise our findings on this but our main observations when we did this is that geograpy criteria was indeed the main differentiating factor between the two models such that Google Gemini didn't seem to be strictly following the prompt of excluding countries that are not lower-middle income or low income countries based on the World Bank list. Studies from countries such as China and Korea wer still getting included into the review when strictly speaking these countries are not on the LMIC and LIC lists of the World Bank. Anthroopic Claude Opus on the other hand exluded these countries. Otherwise, both LLMs fared well with determining whether a journal article met the criteria for age, study type, and the study topic.
+
+We are currently developing the workflow for performing the prompt performance evaluation and we are setting up the computational infrastructure in performing lot quality assurance sampling (LQAS) [@lanata_lot_1988, @biedron_assessment_2010] testing for this assessment. We will report on these findings in the next update.
+
+#### Model costs
+
+```{r}
+#| echo: false
+
+meta <- targets::tar_meta()
+
+x <- meta |>
+  dplyr::filter(
+    grepl(
+      pattern = "gemini_screen_primary|claude_screen_primary",
+      x = name
+    )
+  )
+
+cost_item <- c(
+  "Computing runtime",
+  "Development time",
+  "LLM API calls",
+  "Total"
+)
+
+total_runtime <- x |>
+  dplyr::mutate(
+    model = ifelse(grepl(pattern = "gemini", x = name), "gemini", "claude opus")
+  ) |>
+  dplyr::summarise(hours = sum(seconds) / 3600, .by = model) |>
+  dplyr::pull(hours)
+
+total_devtime <- c(22, 22)
+
+total_api_cost <- c(18.01, 83.22)
+
+cost_df <- data.frame(
+  cost_item,
+  "gemini_qty" = c(total_runtime[1], total_devtime[1], NA_real_, NA_real_),
+  "gemini_unit" = c("hours", "hours", "", ""),
+  "gemini_unit_cost" = c(60, 60, NA_real_, NA_real_),
+  "gemini_total_cost" = c(total_runtime[1] * 60, total_devtime[1] * 60, total_api_cost[1], total_runtime[1] * 60 + total_devtime[1] * 60 + total_api_cost[1]),
+  "claude_qty" = c(total_runtime[2], total_devtime[2], NA_real_, NA_real_),
+  "claude_unit" = c("hours", "hours", "", ""),
+  "claude_unit_cost" = c(60, 60, NA_real_, NA_real_),
+  "claude_total_cost" = c(total_runtime[2] * 60, total_devtime[2] * 60, total_api_cost[2], total_runtime[2] * 60 + total_devtime[2] * 60 + total_api_cost[2])
+) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::contains("_qty"),
+      .fns = ~round(x = .x,  digits = 1)
+    ),
+    dplyr::across(
+      .cols = dplyr::contains("_cost"),
+      .fns = ~scales::label_currency(
+        accuracy = 0.01, prefix = "$", big.mark = ",", trim = FALSE
+      )(.x)
+    )
+  )
+```
+
+@tbl-llm-costs shows the costs incurred from the LLM-assisted screening of journal articles for this scoping review. Using the Google Gemini model was slightly more expensive at **`r cost_df$gemini_total_cost[4]`** compared to Anthropic Claude Opus's **`r cost_df$claude_total_cost[4]`**. This difference is mainly due to Google Gemini's longer compute time (**`r cost_df$gemini_qty[1]`** hours versus Anthropic Claude's **`r cost_df$claude_qty[1]`**).
+
+```{r}
+#| label: tbl-llm-costs
+#| echo: false
+#| html-table-processing: none
+
+cost_df |>
+  knitr::kable(
+    col.names = c(
+      "Cost Item",
+      "Quantity", "Unit", "Unit Cost", "Total",
+      "Quantity", "Unit", "Unit Cost", "Total"
+    ),
+    align = c("l", rep("r", 8))
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE,
+    row_label_position = "c"
+  ) |>
+  kableExtra::add_header_above(
+    header = c(" " = 1, "gemini" = 4, "claude opus" = 4)
+  )
+```
+
+## General observations and next steps
+
+* Our preliminary work with the bibliographic data of the primary search results show that there maybe some refinements that could have been done in the search strategy to be able to exclude articles that don't meet the criteria. This seems to be particularly true for the publication type or study type. Close to 1200 articles that are conference papers/abstracts and meta-analysis/reviews could have been excluded from the final search results. If we believe that the search strategy used is already the most effective and that these results are just slipping through the net, then we might consider doing a secondary search within the primary search results that would look at the bibliographic data and systematically exclude articles based on the metadata information before the search results are sent for human and/or machine screening.
+
+* The search strategy for lower-middle income and low income countries doesn't seem to be performing well. On review of the Cochrane EPOC filter for low income countries (LIC) and lower-middle income countries (LMICs), we noted that this was created in 2021 and during that time and to date, this search filter has not been validated. This search filter is also not currently updated and maintained. For example, the term for Korea is included in this search filter which included studies from South Korea which is an upper-middle income country as per World Bank classification. In general, it seems that the search strategy for geography needs to be improved.
+
+* There is room for improvement in the prompts particulary for the geographic criteria. We will explore and test the use of **chain-of-thought** and **step-by-step instruction** styles of prompting which we expect to yield improved results but potentially higher cost as these would require higher number of tokens for prompting. We have already completed the development and runtime for testing new prompting strategies and we will report on this in the next update.
+
+* To be able to more systematically and programmatically evaluate the performance of the prompts (and indirectly the models) in support of our plans to use LQAS as a metric of performance, we have started to implement additional prompts that asks the model to provide the actual text from the title or abstract that pertains to the criteria that it is evaluating. This is a good way to check on what basis the model decided to say TRUE or FALSE for a specific criteria. Without this, the model has a 50% chance of getting the response correct even just by hallucinating. By asking it to provide the text it used as a basis for its determination of the criteria, then we can verify whether the model is hallucinating. We have completed development and runtime for this and we will sahre the results in the next update.
+
+
+
 
