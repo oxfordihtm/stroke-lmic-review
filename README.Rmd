@@ -19,13 +19,15 @@ knitr::opts_chunk$set(
 [![License for text](https://img.shields.io/badge/license_for_writing-CC_BY_4.0-blue)](https://creativecommons.org/licenses/by/4.0/)
 [![License for data](https://img.shields.io/badge/license_for_data-CC0-blue)](https://creativecommons.org/public-domain/cc0/)
 [![test targets workflow](https://github.com/OxfordIHTM/stroke-lmic-review/actions/workflows/test-targets-workflow.yml/badge.svg)](https://github.com/OxfordIHTM/stroke-lmic-review/actions/workflows/test-targets-workflow.yml)
+[![DOI](https://zenodo.org/badge/1245490195.svg)](https://doi.org/10.5281/zenodo.20556745)
+
 <!-- badges: end -->
 
-This repository is a [`docker`](https://www.docker.com/get-started)-containerised, [`{targets}`](https://docs.ropensci.org/targets/)-based, [`{renv}`](https://rstudio.github.io/renv/articles/renv.html)-enabled [`R`](https://cran.r-project.org/) workflow for a project on mapping the evidence gaps for stroke in low and middle-income countries.
+This repository is a [`docker`](https://www.docker.com/get-started)-containerised, [`{targets}`](https://docs.ropensci.org/targets/)-based, [`{renv}`](https://rstudio.github.io/renv/articles/renv.html)-enabled [`R`](https://cran.r-project.org/) workflow for a project on mapping the evidence gaps for stroke in lower-middle income countries (LMICs) and low income countries (LICs).
 
 ## About the Project
 
-The burden of stroke is among the top five causes of mortality and morbidity in low-middle income countries (LMICs) and low income countries (LICs) and this burden is growing, yet evidence on contributing causes and the efficacy of interventions appears to be disproportionately generated in high-income settings for discrete population groups. This review maps existing evidence drawing on LMIC and LIC populations.  
+The burden of stroke is among the top five causes of mortality and morbidity in LMICs and LICs and this burden is growing, yet evidence on contributing causes and the efficacy of interventions appears to be disproportionately generated in high-income settings for discrete population groups. This review maps existing evidence drawing on LMIC and LIC populations.  
 
 ## Repository Structure
 
@@ -69,6 +71,30 @@ stroke-lmic-review
 * `_targets.R` file defines the steps in the workflow's data ingest, data processing, data analysis, and reporting pipeline.
 
 ## Reproducibility
+
+### System dependencies
+
+This project requires the following system dependencies:
+
+* `poppler`
+
+This project depends on the [`{pdftools}`](https://docs.ropensci.org/pdftools/) package which requires the [`poppler`](https://poppler.freedesktop.org/) PDF rendering library to be installed first. For macOS and Windows users, installation of `{pdftools}` via the binary packages available from CRAN will deal with this requirement automatically. However, for Linux users, the `poppler` library will need to be installed first in order to be able to install `{pdftools}` from source. Installation of the `poppler` library for Linux is described [here](https://docs.ropensci.org/pdftools/#installation).
+
+* `quarto`
+
+This project uses v1.9.37 of [`quarto`](https://quarto.org/) open-source scientific and technical publishing system. Instructions on how to download and install `quarto` can be found [here](https://quarto.org/docs/get-started/).
+
+* `ollama`
+
+This project uses [`ollama`](https://ollama.com/) to serve open large language models locally. Instructions on how to download and install `ollama` can be found [here](https://ollama.com/download). This project specifically uses the following open source models available via `ollama`:
+
+**Model Name**    | **RAM size** | **Context Window**
+:-----------------|-------------:|-------------------:
+`gemma4:31b`      | 20GB         | 256,000 tokens
+`deepseek-r1:70b` | 43GB         | 128,000 tokens
+`qwen3.5:122b`    | 81GB         | 256,000 tokens
+ 
+Once `ollama` is installed, pull the mentioned models above into your local machine. Please note the required random access memory (RAM) sizes for each of these models and ensure that the machine you are using has enough RAM to fit these models.
 
 ### R version
 
