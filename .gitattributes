@@ -2,5 +2,6 @@
 auth/**/* filter=git-crypt diff=git-crypt
 
 *.html linguist-detectable=false
+*.bib linguist-detectable=false
 *.Rmd linguist-language=R
 *.qmd linguist-language=R
