@@ -16,6 +16,10 @@ library(ggplot2)
 library(quarto)
 
 
+## Load packages for plotting and report generation ----
+
+library(oxthema)
+
 ## Load packages for interfacing with web assets ----
 
 library(Microsoft365R)
