@@ -30,9 +30,13 @@ data_targets <- tar_plan(
     pattern = map(ris_file_paths),
     iteration = "list"
   ),
+  # tar_target(
+  #   name = search_full_raw,
+  #   command = synthesisr::read_refs(filename = ris_all_file)
+  # ),
   tar_target(
     name = search_full_raw,
-    command = synthesisr::read_refs(filename = ris_all_file)
+    command = read_ris_file(ris_all_file)
   ),
   retraction_watch_data_url = "https://gitlab.com/crossref/retraction-watch-data/-/raw/main/retraction_watch.csv",
   tar_target(

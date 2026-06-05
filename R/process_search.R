@@ -66,15 +66,14 @@ process_search <- function(search_df) {
       ),
       conference_date = as.Date(x = conference_date, format = "%Y%m%d")
     ) |>
-    dplyr::select(-n_duplicates) |>
     dplyr::select(
-      database, source_type, publication_type, reference_identifier, pubmed_id,
-      accession_zr, issn, language, journal, publisher, title, abstract,
-      keywords, author_1, author_2, author_3, address, author_affiliation_1,
-      author_affiliation_2, author_affiliation_3, year, volume, issue,
-      start_page, end_page, doi, url, link_to_full_text, proceedings_title,
-      conference_date, company, source, chemicals, software_tools,
-      funding_number, notes, XT
+      uid, database, source_type, publication_type, reference_identifier,
+      pubmed_id, accession_zr, issn, language, journal, publisher, title,
+      abstract, keywords, author_1, author_2, author_3, address,
+      author_affiliation_1, author_affiliation_2, author_affiliation_3,
+      year, volume, issue, start_page, end_page, doi, url, link_to_full_text,
+      proceedings_title, conference_date, company, source, chemicals,
+      software_tools, funding_number, notes, XT
     )
   
   df
