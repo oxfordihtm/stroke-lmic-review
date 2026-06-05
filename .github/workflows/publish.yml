@@ -51,15 +51,11 @@ jobs:
         run: |
           renv::restore()
         shell: Rscript {0}
-        
-      - name: Render reports
-        run: |
-          targets::tar_make(preliminary_report)
-        shell: Rscript {0}
 
-      - name: Move reports to docs directory
+      - name: Copy reports to docs directory
         run: |
-          cp reports/preliminary_report.html cp docs/preliminary_report
+          mkdir docs
+          cp reports/preliminary_report.html cp docs
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4

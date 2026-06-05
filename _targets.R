@@ -30,10 +30,6 @@ data_targets <- tar_plan(
     pattern = map(ris_file_paths),
     iteration = "list"
   ),
-  # tar_target(
-  #   name = search_full_raw,
-  #   command = synthesisr::read_refs(filename = ris_all_file)
-  # ),
   tar_target(
     name = search_full_raw,
     command = read_ris_file(ris_all_file)
