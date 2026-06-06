@@ -55,7 +55,7 @@ jobs:
       - name: Copy reports to docs directory
         run: |
           mkdir docs
-          cp reports/preliminary_report.html cp docs
+          cp reports/preliminary_report.html docs
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
