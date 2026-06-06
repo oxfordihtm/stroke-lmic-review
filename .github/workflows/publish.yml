@@ -22,7 +22,7 @@ jobs:
       - name: Install system dependencies
         run: |
           apt-get update && apt-get install -y --no-install-recommends \
-          libxt6 libglpk-dev libuv1-dev cmake git-crypt curl jq \
+          libxt6 libglpk-dev libuv1-dev cmake git-crypt curl jq rsync \
           libpoppler-cpp-dev libmagick++-dev \
           libtesseract-dev libleptonica-dev tesseract-ocr-eng
 
