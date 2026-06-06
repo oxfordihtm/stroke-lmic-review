@@ -16,7 +16,7 @@ title: "Mapping the Evidence Gaps for Stroke in Lower-Middle Income Countries (L
 repository-code: https://github.com/OxfordIHTM/stroke-lmic-review
 license: CC-BY-4.0
 date-released: 2026-06-05
-version: 0.0.0.9000
+version: 0.0.0.9001
 identifiers:
   - type: doi
     value: 10.5281/zenodo.20556745
