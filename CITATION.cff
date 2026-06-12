@@ -11,11 +11,11 @@ contact:
     email: ernest@guevarra.io
     family-names: Guevarra
     given-names: Ernest
-message: "If you use the software in this repository, please cite the software as below"
-title: "Mapping the Evidence Gaps for Stroke in Lower-Middle Income Countries (LMIC) and Low Income Countries (LIC): A Scoping Review"
+message: "If you use the code, text, or data in this repository, please cite it as follows:"
+title: "Mapping the Evidence Gaps for Stroke in Upper-Middle Income Countries (UMIC), Lower-Middle Income Countries (LMIC), and Low Income Countries (LIC): A Scoping Review"
 repository-code: https://github.com/OxfordIHTM/stroke-lmic-review
-license: CC-BY-4.0
-date-released: 2026-06-05
+license: GPL-3.0-or-later
+date-released: 2026-06-11
 version: 0.0.0.9001
 identifiers:
   - type: doi

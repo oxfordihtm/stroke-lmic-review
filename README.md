@@ -1,13 +1,14 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Mapping the Evidence Gaps for Stroke in Lower-Middle Income Countries (LMIC) and Low Income Countries (LIC)
+# Mapping the Evidence Gaps for Stroke in Upper-Middle Income Countries (UMICs), Lower-Middle Income Countries (LMICs), and Low Income Countries (LICs): A Scoping Review
 
 <!-- badges: start -->
 
 [![Project Status: WIP – Initial development is in progress, but there
 has not yet been a stable, usable release suitable for the
 public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![version](https://img.shields.io/badge/version-v0.0.0.9001-orange)](https://github.com/OxfordIHTM/stroke-lmic-review/releases/tag/v0.0.0.9001)
 [![License for
 code](https://img.shields.io/badge/license_for_code-GPL3.0-blue)](https://opensource.org/licenses/gpl-3.0.html)
 [![License for
@@ -17,7 +18,6 @@ data](https://img.shields.io/badge/license_for_data-CC0-blue)](https://creativec
 [![test targets
 workflow](https://github.com/OxfordIHTM/stroke-lmic-review/actions/workflows/test-targets-workflow.yml/badge.svg)](https://github.com/OxfordIHTM/stroke-lmic-review/actions/workflows/test-targets-workflow.yml)
 [![DOI](https://zenodo.org/badge/1245490195.svg)](https://doi.org/10.5281/zenodo.20556745)
-
 <!-- badges: end -->
 
 This repository is a
@@ -25,8 +25,8 @@ This repository is a
 [`{targets}`](https://docs.ropensci.org/targets/)-based,
 [`{renv}`](https://rstudio.github.io/renv/articles/renv.html)-enabled
 [`R`](https://cran.r-project.org/) workflow for a project on mapping the
-evidence gaps for stroke in lower-middle income countries (LMICs) and
-low income countries (LICs).
+evidence gaps for stroke in upper-middle income countries (UMICs),
+lower-middle income countries (LMICs), and low income countries (LICs).
 
 ## About the Project
 
@@ -34,8 +34,9 @@ The burden of stroke is among the top five causes of mortality and
 morbidity in LMICs and LICs and this burden is growing, yet evidence on
 contributing causes and the efficacy of interventions appears to be
 disproportionately generated in high-income settings for discrete
-population groups. This review maps existing evidence drawing on LMIC
-and LIC populations.
+population groups. This review maps existing evidence drawing on
+upper-middle income countries (UMICs), lower-middle income countries
+(LMICs), and low income countries (LICs) populations.
 
 ## Repository Structure
 
@@ -47,8 +48,10 @@ The project repository is structured as follows:
         |-- data-raw/
         |-- outputs/
         |-- R/
-        |-- reports
-        |-- renv
+        |-- renv/
+        |-- reports/
+        |-- slides/
+        |-- tests/
         |-- renv.lock
         |-- .Rprofile
         |-- packages.R
@@ -72,6 +75,11 @@ The project repository is structured as follows:
 
 - `reports/` contains literate code for R Markdown and/or Quarto reports
   rendered in the workflow.
+
+- `slides/` contains literate code for R Markdown and/or Quarto slides
+  rendered in the workflow.
+
+- `tests/` contains test code for testing the workflow’s LLM outputs.
 
 - `renv/` contains `renv` package specific files and directories used by
   the package for maintaining R package dependencies within the project.
@@ -117,7 +125,7 @@ for Linux is described
 
 - `quarto`
 
-This project uses v1.9.37 of [`quarto`](https://quarto.org/) open-source
+This project uses v1.9.38 of [`quarto`](https://quarto.org/) open-source
 scientific and technical publishing system. Instructions on how to
 download and install `quarto` can be found
 [here](https://quarto.org/docs/get-started/).
@@ -135,11 +143,16 @@ specifically uses the following open source models available via
 | `gemma4:31b`      |         20GB |     256,000 tokens |
 | `deepseek-r1:70b` |         43GB |     128,000 tokens |
 | `qwen3.5:122b`    |         81GB |     256,000 tokens |
+| `gpt-oss:120b`    |         65GB |     128,000 tokens |
+| `llama4:16x17b`   |         67GB |  10,000,000 tokens |
 
 Once `ollama` is installed, pull the mentioned models above into your
 local machine. Please note the required random access memory (RAM) sizes
 for each of these models and ensure that the machine you are using has
 enough RAM to fit these models.
+
+For this project, the team used a **Mac Studio M3 Ultra with a 32-core
+CPU, 80-core GPU, and a 512GB RAM**.
 
 ### R version
 
@@ -217,56 +230,71 @@ graph LR
     x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> x6370852b85c7e5e4(["claude_reviewer"]):::skipped
     xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xed2aacb6fec7bf88["claude_screen_primary"]:::skipped
     x6370852b85c7e5e4(["claude_reviewer"]):::skipped --> xed2aacb6fec7bf88["claude_screen_primary"]:::skipped
-    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x6f6e8203fc71af0c(["claude_screen_primary_processed"]):::queued
-    xed2aacb6fec7bf88["claude_screen_primary"]:::skipped --> x6f6e8203fc71af0c(["claude_screen_primary_processed"]):::queued
-    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> x507b3709952dd3c2(["claude_screen_primary_processed_flattened"]):::completed
-    xed2aacb6fec7bf88["claude_screen_primary"]:::skipped --> x507b3709952dd3c2(["claude_screen_primary_processed_flattened"]):::completed
-    x507b3709952dd3c2(["claude_screen_primary_processed_flattened"]):::completed --> xda28e7c56de07219(["claude_screen_primary_processed_flattened_csv"]):::completed
-    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xa7cacf98a8901b23(["deepseek_reviewer"]):::queued
+    xed2aacb6fec7bf88["claude_screen_primary"]:::skipped --> x6f6e8203fc71af0c(["claude_screen_primary_processed"]):::skipped
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x6f6e8203fc71af0c(["claude_screen_primary_processed"]):::skipped
+    xed2aacb6fec7bf88["claude_screen_primary"]:::skipped --> x507b3709952dd3c2(["claude_screen_primary_processed_flattened"]):::queued
+    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> x507b3709952dd3c2(["claude_screen_primary_processed_flattened"]):::queued
+    x507b3709952dd3c2(["claude_screen_primary_processed_flattened"]):::queued --> xda28e7c56de07219(["claude_screen_primary_processed_flattened_csv"]):::queued
     x22ff41defec165cc(["deepseek_model"]):::queued --> xa7cacf98a8901b23(["deepseek_reviewer"]):::queued
-    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> x1cd58d886269795c["deepseek_test_screen_primary"]:::queued
+    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xa7cacf98a8901b23(["deepseek_reviewer"]):::queued
     xa7cacf98a8901b23(["deepseek_reviewer"]):::queued --> x1cd58d886269795c["deepseek_test_screen_primary"]:::queued
-    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::skipped
+    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> x1cd58d886269795c["deepseek_test_screen_primary"]:::queued
     x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::skipped
-    xf0985b06dbe6e89a["gemini_screen_primary"]:::skipped --> x3dbfbc99d94452b0(["gemini_screen_primary_processed"]):::queued
-    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x3dbfbc99d94452b0(["gemini_screen_primary_processed"]):::queued
-    xf0985b06dbe6e89a["gemini_screen_primary"]:::skipped --> x00c1b0b88ef93218(["gemini_screen_primary_processed_flattened"]):::completed
-    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> x00c1b0b88ef93218(["gemini_screen_primary_processed_flattened"]):::completed
-    x00c1b0b88ef93218(["gemini_screen_primary_processed_flattened"]):::completed --> x3da0672e497133c7(["gemini_screen_primary_processed_flattened_csv"]):::completed
-    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xeb04618c59839428(["gemma_reviewer"]):::queued
+    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xf0985b06dbe6e89a["gemini_screen_primary"]:::skipped
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x3dbfbc99d94452b0(["gemini_screen_primary_processed"]):::skipped
+    xf0985b06dbe6e89a["gemini_screen_primary"]:::skipped --> x3dbfbc99d94452b0(["gemini_screen_primary_processed"]):::skipped
+    xf0985b06dbe6e89a["gemini_screen_primary"]:::skipped --> x00c1b0b88ef93218(["gemini_screen_primary_processed_flattened"]):::queued
+    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> x00c1b0b88ef93218(["gemini_screen_primary_processed_flattened"]):::queued
+    x00c1b0b88ef93218(["gemini_screen_primary_processed_flattened"]):::queued --> x3da0672e497133c7(["gemini_screen_primary_processed_flattened_csv"]):::queued
     xfac2732c01b1bb30(["gemma_model"]):::queued --> xeb04618c59839428(["gemma_reviewer"]):::queued
+    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xeb04618c59839428(["gemma_reviewer"]):::queued
     x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> x4979191191b66b4d["gemma_screen_primary"]:::queued
-    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> x4979191191b66b4d["gemma_screen_primary"]:::queued
     xfac2732c01b1bb30(["gemma_model"]):::queued --> x4979191191b66b4d["gemma_screen_primary"]:::queued
+    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> x4979191191b66b4d["gemma_screen_primary"]:::queued
+    x5e5a8c0c5249ee97(["ollama_test_results_urls"]):::skipped --> x6030ab14466ad00b["ollama_test_results"]:::skipped
+    x971c8918645ea4f3(["search_abstract"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
     xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
     xed2aacb6fec7bf88["claude_screen_primary"]:::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
-    x3dbfbc99d94452b0(["gemini_screen_primary_processed"]):::queued --> xf73bae7f10e0156f(["preliminary_report"]):::queued
-    x6f6e8203fc71af0c(["claude_screen_primary_processed"]):::queued --> xf73bae7f10e0156f(["preliminary_report"]):::queued
-    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
     xf0985b06dbe6e89a["gemini_screen_primary"]:::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
     xf493b7d472ff5e59(["screening_prompt"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
-    x971c8918645ea4f3(["search_abstract"]):::completed --> xf73bae7f10e0156f(["preliminary_report"]):::queued
-    x4946600ed43ea69a(["search_title"]):::completed --> xf73bae7f10e0156f(["preliminary_report"]):::queued
     x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
-    x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    x6f6e8203fc71af0c(["claude_screen_primary_processed"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    x3dbfbc99d94452b0(["gemini_screen_primary_processed"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
     x2f7fdb4e976b16f9(["search_full_raw"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
     xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
+    x4946600ed43ea69a(["search_title"]):::skipped --> xf73bae7f10e0156f(["preliminary_report"]):::queued
     xb4a9c9edd73bec9b(["retraction_watch_data_download_csv_file"]):::skipped --> x71f5d31f85b83ceb(["retraction_watch_data"]):::skipped
     xe03e263fab696ab7(["retraction_watch_data_url"]):::skipped --> xb4a9c9edd73bec9b(["retraction_watch_data_download_csv_file"]):::skipped
     x188aa7ffce88bb98(["ris_file_paths"]):::skipped --> x6ba4c23c2738dda8["ris_all"]:::skipped
     x6ba4c23c2738dda8["ris_all"]:::skipped --> x4b7fcdd63fd7fb9a(["ris_all_file"]):::skipped
-    x4946600ed43ea69a(["search_title"]):::completed --> xf493b7d472ff5e59(["screening_prompt"]):::skipped
-    x971c8918645ea4f3(["search_abstract"]):::completed --> xf493b7d472ff5e59(["screening_prompt"]):::skipped
-    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x971c8918645ea4f3(["search_abstract"]):::completed
+    x971c8918645ea4f3(["search_abstract"]):::skipped --> xf493b7d472ff5e59(["screening_prompt"]):::skipped
+    x4946600ed43ea69a(["search_title"]):::skipped --> xf493b7d472ff5e59(["screening_prompt"]):::skipped
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x971c8918645ea4f3(["search_abstract"]):::skipped
     x2f7fdb4e976b16f9(["search_full_raw"]):::skipped --> x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped
     x71f5d31f85b83ceb(["retraction_watch_data"]):::skipped --> xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped
     x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped
     xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> xcf6ddd66dde32d43(["search_full_processed"]):::skipped
     xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> xd596227685e2e430(["search_full_processed_flattened"]):::skipped
-    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> x4b455536a354b302(["search_full_processed_flattened_csv"]):::skipped
+    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> x4b455536a354b302(["search_full_processed_flattened_csv"]):::queued
     x4b7fcdd63fd7fb9a(["ris_all_file"]):::skipped --> x2f7fdb4e976b16f9(["search_full_raw"]):::skipped
     x188aa7ffce88bb98(["ris_file_paths"]):::skipped --> xfda738880e222baf["search_full_ris"]:::queued
-    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x4946600ed43ea69a(["search_title"]):::completed
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x4946600ed43ea69a(["search_title"]):::skipped
+    x971c8918645ea4f3(["search_abstract"]):::skipped --> x8c8d7bd353dd7e1b(["update_slides_20260611"]):::completed
+    xf493b7d472ff5e59(["screening_prompt"]):::skipped --> x8c8d7bd353dd7e1b(["update_slides_20260611"]):::completed
+    xcf6ddd66dde32d43(["search_full_processed"]):::skipped --> x8c8d7bd353dd7e1b(["update_slides_20260611"]):::completed
+    x60ed8e986a8cab2a(["screening_context_prompt"]):::skipped --> x8c8d7bd353dd7e1b(["update_slides_20260611"]):::completed
+    xf0985b06dbe6e89a["gemini_screen_primary"]:::skipped --> x8c8d7bd353dd7e1b(["update_slides_20260611"]):::completed
+    x2f7fdb4e976b16f9(["search_full_raw"]):::skipped --> x8c8d7bd353dd7e1b(["update_slides_20260611"]):::completed
+    x6f6e8203fc71af0c(["claude_screen_primary_processed"]):::skipped --> x8c8d7bd353dd7e1b(["update_slides_20260611"]):::completed
+    xed2aacb6fec7bf88["claude_screen_primary"]:::skipped --> x8c8d7bd353dd7e1b(["update_slides_20260611"]):::completed
+    x3dbfbc99d94452b0(["gemini_screen_primary_processed"]):::skipped --> x8c8d7bd353dd7e1b(["update_slides_20260611"]):::completed
+    xd596227685e2e430(["search_full_processed_flattened"]):::skipped --> x8c8d7bd353dd7e1b(["update_slides_20260611"]):::completed
+    x6030ab14466ad00b["ollama_test_results"]:::skipped --> x8c8d7bd353dd7e1b(["update_slides_20260611"]):::completed
+    x2b5a5c97911afa83(["search_full_deduplicated"]):::skipped --> x8c8d7bd353dd7e1b(["update_slides_20260611"]):::completed
+    xe0f5c577fdbd2edb(["search_full_no_retractions"]):::skipped --> x8c8d7bd353dd7e1b(["update_slides_20260611"]):::completed
+    x4946600ed43ea69a(["search_title"]):::skipped --> x8c8d7bd353dd7e1b(["update_slides_20260611"]):::completed
     
   end
 ```
