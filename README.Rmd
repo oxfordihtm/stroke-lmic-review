@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Mapping the Evidence Gaps for Stroke in Lower-Middle Income Countries (LMIC) and Low Income Countries (LIC)
+# Mapping the Evidence Gaps for Stroke in Upper-Middle Income Countries, Lower-Middle Income Countries (LMICs), and Low Income Countries (LICs)
 
 <!-- badges: start -->
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-This repository is a [`docker`](https://www.docker.com/get-started)-containerised, [`{targets}`](https://docs.ropensci.org/targets/)-based, [`{renv}`](https://rstudio.github.io/renv/articles/renv.html)-enabled [`R`](https://cran.r-project.org/) workflow for a project on mapping the evidence gaps for stroke in lower-middle income countries (LMICs) and low income countries (LICs).
+This repository is a [`docker`](https://www.docker.com/get-started)-containerised, [`{targets}`](https://docs.ropensci.org/targets/)-based, [`{renv}`](https://rstudio.github.io/renv/articles/renv.html)-enabled [`R`](https://cran.r-project.org/) workflow for a project on mapping the evidence gaps for stroke in upper-middle income countries (UMICs), lower-middle income countries (LMICs), and low income countries (LICs).
 
 ## About the Project
 
