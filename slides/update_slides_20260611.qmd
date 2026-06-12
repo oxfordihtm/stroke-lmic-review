@@ -1,0 +1,750 @@
+---
+title: "Updates on the LLM-aided screening of studies for the stroke scoping review"
+subtitle: "Updates as of 11 June 2026"
+
+format:
+  revealjs: 
+    slide-number: true
+    preview-links: auto
+    #logo: ../images/top_logo.jpg
+    css: styles.css
+    #footer: "Tâm Anh Oxford Partnership"
+    embed-resources: true
+title-slide-attributes: 
+  data-background-color: "#002147"
+
+author:
+  - name:
+      given: Minh Cong
+      family: Tran
+      literal: Minh Cong Tran
+    degrees:
+      - DPhil
+    attributes:
+      corresponding: true
+    orcid: 0000-0003-2622-1365
+    url: https://www.globalhealth.ox.ac.uk/our-researchers/minh-tran
+    email: minh.tran@ndm.ox.ac.uk
+    affiliations: 
+      - name: University of Oxford
+        department: Nuffield Department of Medicine
+        group: Centre for Tropical Medicine and Global Health
+        address: Peter Medawar Building for Pathogen Research, South Parks Road
+        city: Oxford
+        country: United Kingdom
+        postal-code: OX1 3SY
+        url: https://www.tropicalmedicine.ox.ac.uk/study-with-us/msc-ihtm
+  - name:
+      given: Ernest
+      family: Guevarra
+      literal: Ernest Guevarra
+    degrees:
+      - MD
+      - MPH
+    attributes:
+      corresponding: true
+    orcid: 0000-0002-4887-4415
+    url: https://ernest.guevarra.io
+    email: ernest@guevarra.io
+    affiliations: 
+      - name: University of Oxford
+        department: Nuffield Department of Medicine
+        group: Centre for Tropical Medicine and Global Health
+        address: Peter Medawar Building for Pathogen Research, South Parks Road
+        city: Oxford
+        country: United Kingdom
+        postal-code: OX1 3SY
+        url: https://www.tropicalmedicine.ox.ac.uk/study-with-us/msc-ihtm
+---
+
+```{r setup}
+#| echo: false
+
+suppressPackageStartupMessages(source(here::here("packages.R")))
+for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
+
+targets::tar_load(
+  c(
+    search_full_raw, search_full_deduplicated, search_full_no_retractions, 
+    search_full_processed, search_full_processed_flattened, 
+    search_title, search_abstract, screening_context_prompt, screening_prompt,
+    gemini_screen_primary, claude_screen_primary, 
+    gemini_screen_primary_processed, claude_screen_primary_processed,
+    ollama_test_results
+  )
+)
+```
+
+
+## Exploratory analysis of the search results {.center background-color="#002147"}
+
+## Distribution of search results by Ovid search database {.center}
+
+```{r}
+#| html-table-processing: none
+#| echo: false
+
+search_full_raw |>
+  dplyr::mutate(
+    database_name = dplyr::case_when(
+      grepl(pattern = "Embase", x = database) ~ "Embase",
+      grepl(pattern = "Global Health", x = database) ~ "Global Health",
+      grepl(pattern = "MEDLINE", x = database) ~ "Ovid Medline"
+    )
+  ) |>
+  dplyr::count(database_name) |>
+  knitr::kable(col.names = c("Database", "n")) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE
+  )
+```
+
+## Distribution of deduplicated search results by Ovid search database {.center}
+
+```{r}
+#| html-table-processing: none
+#| echo: false
+
+search_full_deduplicated |>
+  dplyr::mutate(
+    database_name = dplyr::case_when(
+      grepl(pattern = "Embase", x = database) ~ "Embase",
+      grepl(pattern = "Global Health", x = database) ~ "Global Health",
+      grepl(pattern = "MEDLINE", x = database) ~ "Ovid Medline"
+    )
+  ) |>
+  dplyr::count(database_name) |>
+  knitr::kable(col.names = c("Database", "n")) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE
+  )
+```
+
+## Distribution of search results with no retracted papers by Ovid search database {.center}
+
+```{r}
+#| html-table-processing: none
+#| echo: false
+
+search_full_no_retractions |>
+  dplyr::mutate(
+    database_name = dplyr::case_when(
+      grepl(pattern = "Embase", x = database) ~ "Embase",
+      grepl(pattern = "Global Health", x = database) ~ "Global Health",
+      grepl(pattern = "MEDLINE", x = database) ~ "Ovid Medline"
+    )
+  ) |>
+  dplyr::count(database_name) |>
+  knitr::kable(col.names = c("Database", "n")) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE
+  )
+```
+
+## Articles by database source and year of publication
+
+```{r}
+#| fig-height: 10
+#| fig-width: 16
+#| fig-align: "center"
+#| fig-valign: "center"
+#| echo: false
+
+df <- search_full_processed |>
+  dplyr::mutate(
+    dbname = dplyr::case_when(
+      grepl(pattern = "MEDLINE", x = database) ~ "Medline",
+      grepl(pattern = "Embase", x = database) ~ "Embase",
+      .default = database
+    ),
+    year = factor(x = year, levels = min(year):max(year))
+  ) |>
+  dplyr::count(dbname, year) |>
+  tidyr::complete(dbname, year, fill = list(n = 0))
+
+df |>
+  dplyr::filter(!is.na(year)) |>
+  ggplot2::ggplot(mapping = ggplot2::aes(x = year, y = n, fill = dbname)) +
+  ggplot2::geom_col(
+    position = "stack",
+    alpha = 0.7
+  ) +
+  ggplot2::scale_fill_manual(
+    name = "Database",
+    values = oxthema::get_oxford_colours(
+      pattern = "Oxford green|ocean grey|ochre"
+    )
+  ) +
+  ggplot2::scale_y_continuous(breaks = seq(from = 0, to = 1000, by = 100)) +
+  oxthema::theme_oxford(grid = "Yy", axis_text_size = 14) +
+  ggplot2::theme(
+    axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1),
+    legend.position = "top"
+  )
+```
+
+## Articles by database and publication type 
+
+```{r}
+#| fig-height: 12
+#| fig-width: 20
+#| fig-align: "center"
+#| fig-valign: "center"
+#| echo: false
+
+df <- search_full_processed |>
+  dplyr::mutate(
+    dbname = dplyr::case_when(
+      grepl(pattern = "MEDLINE", x = database) ~ "Medline",
+      grepl(pattern = "Embase", x = database) ~ "Embase",
+      .default = database
+    ),
+    year = factor(x = year, levels = min(year):max(year))
+  ) |>
+  tidyr::unnest(publication_type) |>
+  dplyr::count(dbname, publication_type)
+
+df |>
+  ggplot2::ggplot(
+    mapping = ggplot2::aes(x = n, y = publication_type, fill = dbname)
+  ) +
+  ggplot2::geom_col(
+    position = "stack",
+    alpha = 0.7
+  ) +
+  ggplot2::scale_fill_manual(
+    name = "Database",
+    values = oxthema::get_oxford_colours(
+      pattern = "Oxford green|ocean grey|ochre"
+    )
+  ) +
+  ggplot2::scale_x_continuous(breaks = seq(from = 0, to = 10000, by = 200)) +
+  oxthema::theme_oxford(grid = "Xx", axis_text_size = 14) +
+  ggplot2::theme(
+    axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1),
+    legend.position = "top"
+  )
+```
+
+## The screening {.center}
+
+* We used two frontier large language model (LLM) service providers 
+
+```{r}
+#| echo: false
+#| html-table-processing: none
+
+data.frame(
+  provider = c("Google", "Anthropic"),
+  model_name = c("Gemini 2.5 Flash", "Claude Opus 4.5")
+) |>
+  knitr::kable(col.names = c("Provider", "Model Name")) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE
+  )
+```
+
+* For these services, we chose the accounts and services that didn't send our input data back to the LLM provider to use for training their models.
+
+## The screening workflow {.center}
+
+* We developed a computational workflow that used LLMs to initially screen the title and abstract of the final search results to determine whether they meet the inclusion and exclusion criteria of the scoping review.
+
+* We used the `ellmer` R package to interface programmatically with Google Gemini and Anthropic Claude Opus models.  We provided each LLM with the same system or contextual prompt.
+
+## The context or system prompt {.center .smaller}
+
+> "You are a classifier of research studies on stroke for the purpose of a scoping review. You determine based on the title and abstract of a research study whether it is to be included in the scoping review based on the following criteria. First criteria is that the study should be on a population of age 18 years and older. Second criteria is that the study should be on a population living in lower-middle income (LMIC) or low income countries (LIC) based on the most recent World Bank country classification by income level. Third criteria is that the study should be regarding stroke burden (such as prevalence, incidence, disability-adjusted life years, quality-adjusted life years, disability, death, hospitalisation) OR types of stroke (such as ischaemic stroke, haemorrhagic stroke) OR risk factors for stroke OR interventions for stroke. Fourth criteria is that the study should be based on primarily collected data with a research design such as a cohort study, case-control study, cross-sectional study, or interventional studies. The studies cannot be reports, conference materials, reviews, study protocols, modelling studies, cost of illness studies, case series, case reports, and editorials."
+
+## The screening prompt {.center .smaller}
+
+* We then prompted each LLM with the title and abstract of each of the **`r nrow(search_full_no_retractions)`** articles in the final search results.
+
+* This secondary prompt was provided to each model sequentially on a fresh chat instance to avoid known issue of order effect or prompt ordering sensitivity related to recency bias or anchoring phenomenon.
+
+## Prompt for structured output {.center}
+
+* We provided the LLM instructions on the structure of the response that we wanted. Specifically, we instructed the LLM to output a value of TRUE or FALSE for each of the four inclusion criteria to correspond to whether the article based on the title and abstract meets the criteria. The workflow concatenates the LLM response for each title and abstract prompt into a table.
+
+|**population** | **geography** | **publication_type** | **topic**|
+|:--------------|:--------------|:---------------------|:---------|
+| TRUE          | TRUE          | TRUE                 | TRUE     |
+| FALSE         | TRUE          | TRUE                 | TRUE     |
+
+## Determining inclusion {.center} 
+
+* A final variable is created that determines whether the article should be included to the next stage of the scoping review.
+
+* A study is included to the next stage of the scoping review if all the results for the **population**, **geography**, **publication_type**, and **topic** are TRUE.
+
+## The workflow {.center}
+
+```{r}
+#| results: asis
+#| warning: false
+#| message: false
+#| echo: false
+
+cat(
+  c(
+    "```{mermaid}",
+    "%%| fig-height: 10",
+    "%%| fig-width: 20",
+    targets::tar_mermaid(
+      targets_only = TRUE, outdated = FALSE, legend = FALSE, color = FALSE
+    ),
+    "```"
+  ),
+  sep = "\n"
+)
+```
+
+
+## Preliminary screening results {.center background-color="#002147"}
+
+## LLM screening responses by model, criteria, and overall {.center}
+
+```{r}
+#| fig-height: 10
+#| fig-width: 20
+#| echo: false
+
+gemini_results <- gemini_screen_primary_processed |>
+  dplyr::select(population, geography, type, topic, include_primary) |>
+  tidyr::pivot_longer(
+    cols = population:include_primary, 
+    names_to = "criteria", values_to = "response"
+  ) |>
+  dplyr::mutate(
+    criteria = factor(
+      x = criteria, 
+      levels = c("population", "geography", "type", "topic", "include_primary")
+    )
+  ) |>
+  dplyr::count(criteria, response) |>
+  dplyr::mutate(model = "gemini", .before = criteria)
+  
+claude_results <- claude_screen_primary_processed |>
+  dplyr::select(population, geography, type, topic, include_primary) |>
+  tidyr::pivot_longer(
+    cols = population:include_primary, 
+    names_to = "criteria", values_to = "response"
+  ) |>
+  dplyr::mutate(
+    criteria = factor(
+      x = criteria, 
+      levels = c("population", "geography", "type", "topic", "include_primary")
+    )
+  ) |>
+  dplyr::count(criteria, response) |>
+  dplyr::mutate(model = "claude opus", .before = criteria)
+
+combined_results <- rbind(gemini_results, claude_results)
+  
+combined_results  |>
+  ggplot2::ggplot(mapping = ggplot2::aes(x = criteria, y = n, fill = response)) +
+  ggplot2::geom_col(position = "stack", stat = "identity", alpha = 0.7) +
+  ggplot2::scale_fill_manual(
+    values = oxthema::get_oxford_colours(pattern = "mauve|peach")
+  ) +
+  ggplot2::facet_wrap(. ~ model, ncol = 2) +
+  oxthema::theme_oxford(grid = "Yy", axis_text_size = 10) +
+  ggplot2::theme(legend.position = "top")
+```
+
+## Distribution of criteria results combination {.center}
+
+```{r}
+#| echo: false
+#| html-table-processing: none
+
+gemini <- gemini_screen_primary_processed |>
+  dplyr::select(population, geography, type, topic, include_primary) |>
+  dplyr::mutate(
+    model = "gemini", .before = population
+  )
+
+claude <- claude_screen_primary_processed |>
+  dplyr::select(population, geography, type, topic, include_primary) |>
+  dplyr::mutate(
+    model = "claude-opus", .before = population
+  )
+```
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+### Gemini
+```{r}
+#| echo: false
+#| html-table-processing: none
+
+gemini |>
+  dplyr::count(population, geography, type, topic) |>
+  dplyr::arrange(desc(n)) |>
+  knitr::kable() |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("bordered", "striped"), 
+    full_width = FALSE,
+    font_size = 14
+  )
+```
+:::
+
+::: {.column width="50%"}
+
+### Claude Opus
+```{r}
+#| echo: false
+#| html-table-processing: none
+
+claude |>
+  dplyr::count(population, geography, type, topic) |>
+  dplyr::arrange(desc(n)) |>
+  knitr::kable() |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("bordered", "striped"), 
+    full_width = FALSE,
+    font_size = 14
+  )
+```
+:::
+
+::::
+
+
+## Model costs {.center}
+
+```{r}
+#| echo: false
+
+meta <- targets::tar_meta()
+
+x <- meta |>
+  dplyr::filter(
+    grepl(
+      pattern = "gemini_screen_primary|claude_screen_primary",
+      x = name
+    )
+  )
+
+cost_item <- c(
+  "Computing runtime",
+  "Development time",
+  "LLM API calls",
+  "Total"
+)
+
+total_runtime <- x |>
+  dplyr::mutate(
+    model = ifelse(grepl(pattern = "gemini", x = name), "gemini", "claude opus")
+  ) |>
+  dplyr::summarise(hours = sum(seconds) / 3600, .by = model) |>
+  dplyr::pull(hours)
+
+total_devtime <- c(22, 22)
+
+total_api_cost <- c(18.01, 83.22)
+
+cost_df <- data.frame(
+  cost_item,
+  "gemini_qty" = c(total_runtime[1], total_devtime[1], NA_real_, NA_real_),
+  "gemini_unit" = c("hours", "hours", "", ""),
+  "gemini_unit_cost" = c(60, 60, NA_real_, NA_real_),
+  "gemini_total_cost" = c(total_runtime[1] * 60, total_devtime[1] * 60, total_api_cost[1], total_runtime[1] * 60 + total_devtime[1] * 60 + total_api_cost[1]),
+  "claude_qty" = c(total_runtime[2], total_devtime[2], NA_real_, NA_real_),
+  "claude_unit" = c("hours", "hours", "", ""),
+  "claude_unit_cost" = c(60, 60, NA_real_, NA_real_),
+  "claude_total_cost" = c(total_runtime[2] * 60, total_devtime[2] * 60, total_api_cost[2], total_runtime[2] * 60 + total_devtime[2] * 60 + total_api_cost[2])
+) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::contains("_qty"),
+      .fns = ~round(x = .x,  digits = 1)
+    ),
+    dplyr::across(
+      .cols = dplyr::contains("_cost"),
+      .fns = ~scales::label_currency(
+        accuracy = 0.01, prefix = "$", big.mark = ",", trim = FALSE
+      )(.x)
+    )
+  )
+```
+
+```{r}
+#| echo: false
+#| html-table-processing: none
+
+cost_df |>
+  knitr::kable(
+    col.names = c(
+      "Cost Item",
+      "Quantity", "Unit", "Unit Cost", "Total",
+      "Quantity", "Unit", "Unit Cost", "Total"
+    ),
+    align = c("l", rep("r", 8))
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE,
+    row_label_position = "c",
+    font_size = 24
+  ) |>
+  kableExtra::add_header_above(
+    header = c(" " = 1, "gemini" = 4, "claude opus" = 4)
+  )
+```
+
+## General observations and next steps {.center}
+
+* Some refinements could be done in the search strategy to exclude articles that don't meet the criteria
+
+* If the search strategy used is already the most effective and that these results are just slipping through the net, consider doing a secondary search within the primary search results that would look at the bibliographic data and systematically exclude articles before the search results are sent for human and/or machine screening.
+
+## General observations and next steps {.center}
+
+* Search strategy for lower-middle income and low income countries doesn't seem to be performing well.
+
+* The Cochrane EPOC filter for low income countries (LIC) and lower-middle income countries (LMICs) was created in 2021 and during that time and to date, this search filter has not been validated. This search filter is also not currently updated and maintained.
+
+## General observations and next steps {.center}
+
+* Improve the prompts. Explore and test the use of **chain-of-thought** and **step-by-step instruction** styles of prompting.
+
+* Implement additional prompts that ask the model to provide the actual text from the title or abstract that pertains to the criteria that it is evaluating. This is a good way to check on what basis the model decided to say TRUE or FALSE for a specific criteria.
+
+## Current development {.center background-color="#002147"}
+
+## Improved prompts {.center}
+
+* From 31 May 2026 to 7 June 2026, we went through a series of refactoring of the system or context prompt used for the LLM screening workflow.
+* During this period, we went through 15 iterations of the prompt, with the final version of the prompt being used for the screening workflow that was run on 7 June 2026.
+* The various iterations of the prompt can be viewed here - <https://github.com/OxfordIHTM/stroke-lmic-ollama/commits/main/prompts/prompt-screening-context.md>
+
+## Improved prompts - testing performance {.center .smaller}
+
+* We tested the new prompts onto the first 20 articles in the search results.
+* We then reviewed the model responses and evaluated them based on the following:
+
+    - Whether the model response correctly identified the relevant text from the title or abstract that pertains to each of the criteria that it is evaluating.
+    - Whether the model response correctly evaluated whether the article meets each of the criteria based on the identified text from the title or abstract.
+
+* We then made further refinements to the prompt based on the performance of the model on these 20 articles.
+
+## Improved prompts {.center}
+
+* The improved prompt now include upper-middle income countries based on the World Bank classification of countries by income level.
+* The main change was to make the prompt more explicit and structured in terms of the instructions provided to the LLM.
+* We also added instructions for the LLM to provide the specific text from the title or abstract that pertains to each of the criteria that it is evaluating.
+
+## Improved prompts - new output structure {.center}
+
+* The output provided by the models have the following structure (in JSON format):
+
+```json
+{
+  "age_context": "adults",
+  "age_criteria": "TRUE",
+  "geo_context": "China",
+  "geo_criteria": "TRUE",
+  "study_type_context": "cross-sectional study",
+  "study_type_criteria": "TRUE",
+  "topic_context": "stroke prevalence",
+  "topic_criteria": "TRUE"
+}
+```
+
+## Use of open source local LLMs {.center}
+
+* For this stage of the development, we shifted from using the frontier LLM services to using open source local LLMs that are run on machines purchased and owned by IHTM specifically for the purpose of developing LLM applications. 
+* This is to address the issue of cost and to have more control over the model and the data used for screening.
+
+## Use of open source local LLMs {.center .smaller}
+
+* We used [Ollama](https://ollama.com/) - an open-source tool that allows running of open source LLMs on one's own computer.
+
+* We used the following open source models available via Ollama:
+
+**Model Name**    | **RAM size** | **Context Window**
+:-----------------|-------------:|-------------------:
+`gemma4:31b`      | 20GB         | 256,000 tokens
+`deepseek-r1:70b` | 43GB         | 128,000 tokens
+`qwen3.5:122b`    | 81GB         | 256,000 tokens
+`gpt-oss:120b`    | 65GB         | 128,000 tokens
+`llama4:16x17b`   | 67GB         | 10,000,000 tokens
+
+## Model costs {.center}
+
+```{r}
+#| echo: false
+
+cost_item <- c(
+  "Computing runtime",
+  "Development time",
+  "LLM API calls",
+  "Total"
+)
+
+total_runtime <- c(51.4, 23)
+
+total_devtime <- c(22, 22)
+
+total_api_cost <- c(0, 0)
+
+cost_df <- data.frame(
+  cost_item,
+  "gemini_qty" = c(total_runtime[1], total_devtime[1], NA_real_, NA_real_),
+  "gemini_unit" = c("hours", "hours", "", ""),
+  "gemini_unit_cost" = c(60, 60, NA_real_, NA_real_),
+  "gemini_total_cost" = c(total_runtime[1] * 60, total_devtime[1] * 60, total_api_cost[1], total_runtime[1] * 60 + total_devtime[1] * 60 + total_api_cost[1]),
+  "claude_qty" = c(total_runtime[2], total_devtime[2], NA_real_, NA_real_),
+  "claude_unit" = c("hours", "hours", "", ""),
+  "claude_unit_cost" = c(60, 60, NA_real_, NA_real_),
+  "claude_total_cost" = c(total_runtime[2] * 60, total_devtime[2] * 60, total_api_cost[2], total_runtime[2] * 60 + total_devtime[2] * 60 + total_api_cost[2])
+) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = dplyr::contains("_qty"),
+      .fns = ~round(x = .x,  digits = 1)
+    ),
+    dplyr::across(
+      .cols = dplyr::contains("_cost"),
+      .fns = ~scales::label_currency(
+        accuracy = 0.01, prefix = "$", big.mark = ",", trim = FALSE
+      )(.x)
+    )
+  )
+```
+
+```{r}
+#| echo: false
+#| html-table-processing: none
+
+cost_df |>
+  knitr::kable(
+    col.names = c(
+      "Cost Item",
+      "Quantity", "Unit", "Unit Cost", "Total",
+      "Quantity", "Unit", "Unit Cost", "Total"
+    ),
+    align = c("l", rep("r", 8))
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE,
+    row_label_position = "c",
+    font_size = 24
+  ) |>
+  kableExtra::add_header_above(
+    header = c(" " = 1, "gpt" = 4, "llama" = 4)
+  )
+```
+
+## Example outputs - gpt-oss {.center .smaller}
+
+```{r}
+#| echo: false
+
+gpt <- ollama_test_results |>
+  dplyr::filter(model == "gpt") |>
+  dplyr::select(age_context:topic_criteria) |>
+  dplyr::slice(1:10)
+
+gpt |>
+  knitr::kable() |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE,
+    font_size = 12
+  )
+```
+
+## Example outputs - llama {.center .smaller}
+
+```{r}
+#| echo: false
+
+llama <- ollama_test_results |>
+  dplyr::filter(model == "llama") |>
+  dplyr::select(age_context:topic_criteria) |>
+  dplyr::slice(1:10)
+
+llama |>
+  knitr::kable() |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE,
+    font_size = 12
+  )
+```
+
+## Example outputs - gemma4 {.center .smaller}
+
+```{r}
+#| echo: false
+
+gemma <- ollama_test_results |>
+  dplyr::filter(model == "gemma") |>
+  dplyr::select(age_context:topic_criteria) |>
+  dplyr::slice(1:10)
+
+gemma |>
+  knitr::kable() |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE,
+    font_size = 12
+  )
+```
+
+## Example outputs - deepseek {.center .smaller}
+
+```{r}
+#| echo: false
+
+deepseek <- ollama_test_results |>
+  dplyr::filter(model == "deepseek") |>
+  dplyr::select(age_context:topic_criteria) |>
+  dplyr::slice(1:10)
+
+deepseek |>
+  knitr::kable() |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE,
+    font_size = 12
+  )
+```
+
+## Example outputs - qwen {.center .smaller}
+
+```{r}
+#| echo: false
+
+qwen <- ollama_test_results |>
+  dplyr::filter(model == "qwen") |>
+  dplyr::select(age_context:topic_criteria) |>
+  dplyr::slice(1:10)
+
+qwen |>
+  knitr::kable() |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "bordered"),
+    full_width = FALSE,
+    font_size = 12
+  )
+```
+
+## General observations {.center}
+
+* Instructions following for the age, geography, and study type is generally well followed by the models, but instructions for the topic criteria is not as well followed. This is likely because the topic criteria is more complex and has more components compared to the other criteria.
+* The models are able to identify the relevant text from the title and abstract that pertains to each of the criteria, but they are not always able to correctly evaluate whether the article meets each of the criteria based on the identified text.
+
+## Next steps {.center}
+
+* Given the adjustments done by the project team to the scoping review protocol and for a revision of the search strategy, we will wait for the new search results to be generated before we do further testing and refinement of the prompts and the workflow.

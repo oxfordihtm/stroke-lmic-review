@@ -26,7 +26,7 @@ author:
         country: United Kingdom
         postal-code: OX1 3SY
         url: https://www.tropicalmedicine.ox.ac.uk/study-with-us/msc-ihtm
-date: "`r format(Sys.Date(), '%d %B %Y')`"
+date: "5 June 2026"
 
 bibliography:
   - references.bib
@@ -210,7 +210,7 @@ data.frame(step, search) |>
 
 ### Search results
 
-A abovementioned search strategy for each of the three Ovid databases used for the search yielded a total of **`r nrow(search_full_raw)`** publications. These results were exported from Ovid as Research Information Systems (RIS) files, plain text bibliographic data files that uses stanardised two-letter tags for bibliographic metadata fields. Ovid only allowed for batch export of 2000 search results at a time hence 6 RIS files were exported namely
+The abovementioned search strategy for each of the three Ovid databases used for the search yielded a total of **`r nrow(search_full_raw)`** publications. These results were exported from Ovid as Research Information Systems (RIS) files, plain text bibliographic data files that uses stanardised two-letter tags for bibliographic metadata fields. Ovid only allowed for batch export of 2000 search results at a time hence 6 RIS files were exported namely
 
 ```{r}
 #| echo: false
@@ -478,7 +478,7 @@ where **population** is for whether the study population is for adults (age >= 1
 
 Once the LLM has completed reviewing each of the **`r nrow(search_full_no_retractions)`** articles in our full search, the workflow then concatenates the LLM outputs with the final search results table. A final variable is created that determines whether the article should be included to the next stage of the scoping review. A study is included to the next stage of the scoping review if all the results for the **population**, **geography**, **publication_type**, and **topic** are TRUE.
 
-This entire workflow is documented in R code and the current version (v0.0.0.9000) which this preliminary report is based on can be reviewed at <https://github.com/OxfordIHTM/stroke-lmic-review>.
+This entire workflow is documented in R code and the current version (v0.0.0.9000) which this preliminary report is based on can be reviewed at <https://github.com/OxfordIHTM/stroke-lmic-review/tree/v0.0.0.9000>.
 
 @fig-workflow-diagram is a diagram flowchart of the entire workflow (from data ingest to LLM screening)
 
@@ -557,7 +557,7 @@ combined_results  |>
   ggplot2::theme(legend.position = "top")
 ```
 
-@tbl-tbl-results-by-criteria-combination below show the distribution of the screening results by combination of responses to the each of the four criteria. We see that both Google Gemini and Anthropic Claude Opus models excluded the most journal articles based on the geography criteria.
+@tbl-results-by-criteria-combination below show the distribution of the screening results by combination of responses to the each of the four criteria. We see that both Google Gemini and Anthropic Claude Opus models excluded the most journal articles based on the geography criteria.
 
 ```{r}
 #| label: tbl-results-by-criteria-combination
@@ -597,7 +597,7 @@ A key output that we need to measure is how well the models performed in this jo
 
 For this preliminary report, we focus on ***prompt performance*** as a proxy of model performance. Because these first steps that we are doing are primarily to map out the workflow for LLM-aided screening of journal articles for a scoping review, we wanted to use the results from this first run to inform and improve the prompts that we are provided the LLMs. To do this, we basically selected the first 20 titles and abstracts and reviewed the results provided by the LLMs and then compared this to the results we would have given to these articles for each of the criteria.
 
-We have yet to organise our findings on this but our main observations when we did this is that geograpy criteria was indeed the main differentiating factor between the two models such that Google Gemini didn't seem to be strictly following the prompt of excluding countries that are not lower-middle income or low income countries based on the World Bank list. Studies from countries such as China and Korea wer still getting included into the review when strictly speaking these countries are not on the LMIC and LIC lists of the World Bank. Anthroopic Claude Opus on the other hand exluded these countries. Otherwise, both LLMs fared well with determining whether a journal article met the criteria for age, study type, and the study topic.
+We have yet to organise our findings on this but our main observations when we did this is that geograpy criteria was indeed the main differentiating factor between the two models such that Google Gemini didn't seem to be strictly following the prompt of excluding countries that are not lower-middle income or low income countries based on the World Bank list. Studies from countries such as China and Korea were still getting included into the review when strictly speaking these countries are not on the LMIC and LIC lists of the World Bank. Anthroopic Claude Opus on the other hand exluded these countries. Otherwise, both LLMs fared well with determining whether a journal article met the criteria for age, study type, and the study topic.
 
 We are currently developing the workflow for performing the prompt performance evaluation and we are setting up the computational infrastructure in performing lot quality assurance sampling (LQAS) [@lanata_lot_1988, @biedron_assessment_2010] testing for this assessment. We will report on these findings in the next update.
 
@@ -663,6 +663,7 @@ cost_df <- data.frame(
 
 ```{r}
 #| label: tbl-llm-costs
+#| tbl-cap: Estimated costs of using Gemini and Claude Opus for the LLM-aided screening workflow
 #| echo: false
 #| html-table-processing: none
 
@@ -691,9 +692,9 @@ cost_df |>
 
 * The search strategy for lower-middle income and low income countries doesn't seem to be performing well. On review of the Cochrane EPOC filter for low income countries (LIC) and lower-middle income countries (LMICs), we noted that this was created in 2021 and during that time and to date, this search filter has not been validated. This search filter is also not currently updated and maintained. For example, the term for Korea is included in this search filter which included studies from South Korea which is an upper-middle income country as per World Bank classification. In general, it seems that the search strategy for geography needs to be improved.
 
-* There is room for improvement in the prompts particulary for the geographic criteria. We will explore and test the use of **chain-of-thought** and **step-by-step instruction** styles of prompting which we expect to yield improved results but potentially higher cost as these would require higher number of tokens for prompting. We have already completed the development and runtime for testing new prompting strategies and we will report on this in the next update.
+* There is room for improvement in the prompts particularly for the geographic criteria. We will explore and test the use of **chain-of-thought** and **step-by-step instruction** styles of prompting which we expect to yield improved results but potentially higher cost as these would require higher number of tokens for prompting. We have already completed the development and runtime for testing new prompting strategies and we will report on this in the next update.
 
-* To be able to more systematically and programmatically evaluate the performance of the prompts (and indirectly the models) in support of our plans to use LQAS as a metric of performance, we have started to implement additional prompts that asks the model to provide the actual text from the title or abstract that pertains to the criteria that it is evaluating. This is a good way to check on what basis the model decided to say TRUE or FALSE for a specific criteria. Without this, the model has a 50% chance of getting the response correct even just by hallucinating. By asking it to provide the text it used as a basis for its determination of the criteria, then we can verify whether the model is hallucinating. We have completed development and runtime for this and we will sahre the results in the next update.
+* To be able to more systematically and programmatically evaluate the performance of the prompts (and indirectly the models) in support of our plans to use LQAS as a metric of performance, we have started to implement additional prompts that ask the model to provide the actual text from the title or abstract that pertains to the criteria that it is evaluating. This is a good way to check on what basis the model decided to say TRUE or FALSE for a specific criteria. Without this, the model has a 50% chance of getting the response correct even just by hallucinating. By asking it to provide the text it used as a basis for its determination of the criteria, then we can verify whether the model is hallucinating. We have completed development and runtime for this and we will share the results in the next update.
 
 
 

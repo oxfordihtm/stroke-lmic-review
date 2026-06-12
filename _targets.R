@@ -46,6 +46,20 @@ data_targets <- tar_plan(
     command = retraction_load_data(
       path = retraction_watch_data_download_csv_file
     )
+  ),
+  ollama_test_results_urls = c(
+    "https://raw.githubusercontent.com/OxfordIHTM/stroke-lmic-ollama/refs/heads/main/data/deepseek_test_screen_primary_flattened.csv",
+    "https://raw.githubusercontent.com/OxfordIHTM/stroke-lmic-ollama/refs/heads/main/data/gemma_test_screen_primary_flattened.csv",
+    "https://raw.githubusercontent.com/OxfordIHTM/stroke-lmic-ollama/refs/heads/main/data/gpt_test_screen_primary_flattened.csv",
+    "https://raw.githubusercontent.com/OxfordIHTM/stroke-lmic-ollama/refs/heads/main/data/llama_test_screen_primary_flattened.csv",
+    "https://raw.githubusercontent.com/OxfordIHTM/stroke-lmic-ollama/refs/heads/main/data/qwen_test_screen_primary_flattened.csv"
+  ),
+  tar_target(
+    name = ollama_test_results,
+    command = read_screening_primary_results(
+      file_path = ollama_test_results_urls
+    ),
+    pattern = map(ollama_test_results_urls)
   )
 )
 
@@ -236,6 +250,10 @@ report_targets <- tar_plan(
   tar_quarto(
     name = preliminary_report,
     path = "reports/preliminary_report.qmd"
+  ),
+  tar_quarto(
+    name = update_slides_20260611,
+    path = "slides/update_slides_20260611.qmd"
   )
 )
 
