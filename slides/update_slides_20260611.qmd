@@ -6,9 +6,7 @@ format:
   revealjs: 
     slide-number: true
     preview-links: auto
-    #logo: ../images/top_logo.jpg
     css: styles.css
-    #footer: "Tâm Anh Oxford Partnership"
     embed-resources: true
 title-slide-attributes: 
   data-background-color: "#002147"
@@ -590,12 +588,12 @@ cost_item <- c(
   "Total"
 )
 
-total_runtime <- c(51.4, 23)
+total_runtime <- c(51.4, 23, 81.5)
 
-total_devtime <- c(22, 22)
+total_devtime <- c(22, 22, 22)
 
-total_api_cost <- c(0, 0)
-
+total_api_cost <- c(0, 0, 0)
+  
 cost_df <- data.frame(
   cost_item,
   "gemini_qty" = c(total_runtime[1], total_devtime[1], NA_real_, NA_real_),
@@ -605,7 +603,11 @@ cost_df <- data.frame(
   "claude_qty" = c(total_runtime[2], total_devtime[2], NA_real_, NA_real_),
   "claude_unit" = c("hours", "hours", "", ""),
   "claude_unit_cost" = c(60, 60, NA_real_, NA_real_),
-  "claude_total_cost" = c(total_runtime[2] * 60, total_devtime[2] * 60, total_api_cost[2], total_runtime[2] * 60 + total_devtime[2] * 60 + total_api_cost[2])
+  "claude_total_cost" = c(total_runtime[2] * 60, total_devtime[2] * 60, total_api_cost[2], total_runtime[2] * 60 + total_devtime[2] * 60 + total_api_cost[2]),
+  "gemma_qty" = c(total_runtime[3], total_devtime[3], NA_real_, NA_real_),
+  "gemma_unit" = c("hours", "hours", "", ""),
+  "gemma_unit_cost" = c(60, 60, NA_real_, NA_real_),
+  "gemma_total_cost" = c(total_runtime[3] * 60, total_devtime[3] * 60, total_api_cost[3], total_runtime[3] * 60 + total_devtime[3] * 60 + total_api_cost[3])
 ) |>
   dplyr::mutate(
     dplyr::across(
@@ -630,20 +632,26 @@ cost_df |>
     col.names = c(
       "Cost Item",
       "Quantity", "Unit", "Unit Cost", "Total",
+      "Quantity", "Unit", "Unit Cost", "Total",
       "Quantity", "Unit", "Unit Cost", "Total"
     ),
-    align = c("l", rep("r", 8))
+    align = c("l", rep("r", 12))
   ) |>
   kableExtra::kable_styling(
     bootstrap_options = c("striped", "bordered"),
     full_width = FALSE,
     row_label_position = "c",
-    font_size = 24
+    font_size = 18
   ) |>
   kableExtra::add_header_above(
-    header = c(" " = 1, "gpt" = 4, "llama" = 4)
+    header = c(" " = 1, "gpt" = 4, "llama" = 4, "gemma" = 4)
+  ) |>
+  kableExtra::footnote(
+    general = "The workflows using the deepseek and qwen models are still running as of 11 June 2026 and the results are not yet available."
   )
 ```
+
+
 
 ## Example outputs - gpt-oss {.center .smaller}
 
